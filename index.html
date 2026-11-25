@@ -104,23 +104,109 @@
 
             <!-- แถบสลับหน้าหลัก (Navigation Tabs) -->
             <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl border border-slate-200/60">
-                <button id="tab-calendar" onclick="switchTab('calendar')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all bg-white text-indigo-600 shadow-sm">
-                    <i class="ph-duotone ph-calendar-blank text-lg"></i>
-                    <span>ปฏิทินการบ้าน</span>
-                </button>
-                <button id="tab-schedule" onclick="switchTab('schedule')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all text-slate-600 hover:text-slate-900">
+                <button id="tab-schedule" onclick="switchTab('schedule')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all bg-white text-indigo-600 shadow-sm">
                     <i class="ph-duotone ph-clock-afternoon text-lg"></i>
                     <span>ตารางเรียน</span>
+                </button>
+                <button id="tab-calendar" onclick="switchTab('calendar')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all text-slate-600 hover:text-slate-900">
+                    <i class="ph-duotone ph-calendar-blank text-lg"></i>
+                    <span>ปฏิทินการบ้าน</span>
                 </button>
             </div>
         </div>
     </header>
 
     <!-- ==================== MAIN CONTENT AREA ==================== -->
-    <main class="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-4 py-5 pb-24">
+    <main class="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-4 py-5 pb-24">
 
-        <!-- ==================== VIEW 1: ปฏิทินการบ้าน (HOMEWORK CALENDAR) ==================== -->
-        <section id="view-calendar" class="space-y-5">
+        <!-- ==================== VIEW 1: ตารางเรียน (CLASS SCHEDULE - DEFAULT VIEW) ==================== -->
+        <section id="view-schedule" class="space-y-5">
+            
+            <!-- แถบควบคุมตารางเรียน + สลับโหมดตาราง/รายการ -->
+            <div class="bg-white rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200/70">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2.5 flex-wrap">
+                            <h2 class="text-lg sm:text-xl font-bold text-slate-800">ตารางเรียนประจำสัปดาห์</h2>
+                            <span id="current-day-indicator" class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70">
+                                วันนี้: วันพฤหัสบดี
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">คลิกที่ช่องรายวิชาในตารางเพื่อจดการบ้านวิชานั้นได้ทันที</p>
+                    </div>
+
+                    <!-- ปุ่มสลับมุมมองตาราง (Grid) / รายการ (List) -->
+                    <div class="flex items-center gap-2 self-start md:self-auto bg-slate-100 p-1 rounded-2xl border border-slate-200/60">
+                        <button id="btn-mode-grid" onclick="setScheduleMode('grid')" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-white text-indigo-600 shadow-sm transition">
+                            <i class="ph-duotone ph-table text-base"></i> แบบตารางรวม
+                        </button>
+                        <button id="btn-mode-list" onclick="setScheduleMode('list')" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition">
+                            <i class="ph-duotone ph-list-bullets text-base"></i> แบบรายการรายวัน
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ปุ่มตัวกรองวัน (แสดงเฉพาะตอนเลือกโหมด List View) -->
+                <div id="day-filter-wrapper" class="hidden mt-4 pt-3 border-t border-slate-100">
+                    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1" id="day-filter-buttons">
+                        <button onclick="filterSchedule('ALL')" data-day="ALL" class="day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-indigo-600 text-white shadow-sm whitespace-nowrap transition">
+                            ทั้งหมด (5 วัน)
+                        </button>
+                        <button onclick="filterSchedule('จันทร์')" data-day="จันทร์" class="day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">
+                            วันจันทร์
+                        </button>
+                        <button onclick="filterSchedule('อังคาร')" data-day="อังคาร" class="day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">
+                            วันอังคาร
+                        </button>
+                        <button onclick="filterSchedule('พุธ')" data-day="พุธ" class="day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">
+                            วันพุธ
+                        </button>
+                        <button onclick="filterSchedule('พฤหัสบดี')" data-day="พฤหัสบดี" class="day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">
+                            วันพฤหัสบดี
+                        </button>
+                        <button onclick="filterSchedule('ศุกร์')" data-day="ศุกร์" class="day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">
+                            วันศุกร์
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- มุมมอง 1A: ตารางเรียนแบบ Grid รายสัปดาห์ (08:00 - 18:00) -->
+            <div id="schedule-grid-wrapper" class="bg-white rounded-3xl shadow-sm border border-slate-200/70 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <div id="schedule-timetable-grid" class="min-w-[820px]">
+                        <!-- สร้างตาราง 10 ชั่วโมง (08:00-18:00) x 5 วัน ด้วย JS -->
+                    </div>
+                </div>
+                <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-200/70 flex items-center justify-between text-xs text-slate-500">
+                    <span><i class="ph-fill ph-info text-indigo-500 mr-1"></i> เลื่อนซ้าย-ขวาได้บนหน้าจอมือถือ</span>
+                    <span>รวมทั้งหมด 14 คาบเรียน / สัปดาห์</span>
+                </div>
+            </div>
+
+            <!-- มุมมอง 1B: ตารางเรียนแบบรายการรายวัน (List View) -->
+            <div id="schedule-list-container" class="hidden space-y-5">
+                <!-- เติมข้อมูลตารางเรียนแบบรายการผ่าน JavaScript -->
+            </div>
+
+            <!-- สรุปรายวิชาทั้งหมด 9 วิชา (Color Legend) -->
+            <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/70">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                        <i class="ph-duotone ph-books text-indigo-600 text-lg"></i> รายวิชาที่ลงทะเบียนทั้งหมด (9 วิชา)
+                    </h3>
+                    <button onclick="openAddModal()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                        <i class="ph-bold ph-plus"></i> จดการบ้านด่วน
+                    </button>
+                </div>
+                <div id="subjects-legend" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                    <!-- เติมรายวิชาทั้ง 9 วิชา -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 2: ปฏิทินการบ้าน (HOMEWORK CALENDAR) ==================== -->
+        <section id="view-calendar" class="hidden space-y-5">
             
             <!-- แถบควบคุมปฏิทิน + ปุ่มเพิ่มการบ้าน -->
             <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/70 flex flex-wrap items-center justify-between gap-3">
@@ -173,8 +259,8 @@
                 <div class="lg:col-span-7 bg-white rounded-3xl p-5 shadow-sm border border-slate-200/70">
                     <div class="flex items-center justify-between mb-4">
                         <div>
-                            <span class="text-xs font-medium text-indigo-600 uppercase tracking-wider">รายการงานประจำวัน</span>
-                            <h3 id="selected-date-heading" class="text-lg font-bold text-slate-800">วันพุธที่ 25 พฤศจิกายน 2569</h3>
+                            <span class="text-xs font-medium text-indigo-600 uppercase tracking-wider">รายการงานประจำวัน (คลิกที่งานเพื่อดูรายละเอียด)</span>
+                            <h3 id="selected-date-heading" class="text-lg font-bold text-slate-800">วันพฤหัสบดีที่ 26 พฤศจิกายน 2569</h3>
                         </div>
                         <button onclick="openAddModal(selectedDateStr)" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs sm:text-sm font-semibold transition">
                             <i class="ph-bold ph-plus"></i> เพิ่มงานวันนี้
@@ -196,77 +282,23 @@
                             <h3 class="text-base font-bold text-slate-800">งานค้างส่งทั้งหมด</h3>
                         </div>
                     </div>
-                    <div id="upcoming-tasks-list" class="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
+                    <div id="upcoming-tasks-list" class="space-y-2.5 max-h-[340px] overflow-y-auto pr-1">
                         <!-- แสดงงานที่ยังไม่เสร็จเรียงตามวันส่ง -->
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ==================== VIEW 2: ตารางเรียน (CLASS SCHEDULE) ==================== -->
-        <section id="view-schedule" class="hidden space-y-5">
-            
-            <!-- แถบเลือกวันเรียน -->
-            <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-200/70">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-                    <div>
-                        <h2 class="text-lg font-bold text-slate-800">ตารางเรียนประจำสัปดาห์</h2>
-                        <p class="text-xs text-slate-500">กดที่รายวิชาเพื่อเพิ่มการบ้านของวิชานั้นได้ทันที</p>
-                    </div>
-                    <span id="current-day-indicator" class="self-start sm:self-auto text-xs font-medium px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                        วันนี้: วันพุธ
-                    </span>
-                </div>
-
-                <!-- ปุ่มตัวกรองวัน -->
-                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1" id="day-filter-buttons">
-                    <button onclick="filterSchedule('ALL')" data-day="ALL" class="day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-indigo-600 text-white shadow-sm whitespace-nowrap transition">
-                        ทั้งหมด (5 วัน)
-                    </button>
-                    <button onclick="filterSchedule('จันทร์')" data-day="จันทร์" class="day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">
-                        วันจันทร์
-                    </button>
-                    <button onclick="filterSchedule('อังคาร')" data-day="อังคาร" class="day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">
-                        วันอังคาร
-                    </button>
-                    <button onclick="filterSchedule('พุธ')" data-day="พุธ" class="day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">
-                        วันพุธ
-                    </button>
-                    <button onclick="filterSchedule('พฤหัสบดี')" data-day="พฤหัสบดี" class="day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">
-                        วันพฤหัสบดี
-                    </button>
-                    <button onclick="filterSchedule('ศุกร์')" data-day="ศุกร์" class="day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">
-                        วันศุกร์
-                    </button>
-                </div>
-            </div>
-
-            <!-- รายการตารางเรียนแยกตามวัน -->
-            <div id="schedule-container" class="space-y-5">
-                <!-- เติมข้อมูลตารางเรียนผ่าน JavaScript -->
-            </div>
-
-            <!-- สรุปรายวิชาทั้งหมด 9 วิชา (Color Legend) -->
-            <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/70">
-                <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
-                    <i class="ph-duotone ph-books text-indigo-600 text-lg"></i> รายวิชาที่ลงทะเบียนทั้งหมด (9 วิชา)
-                </h3>
-                <div id="subjects-legend" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                    <!-- เติมรายวิชาทั้ง 9 วิชา -->
-                </div>
-            </div>
-        </section>
-
     </main>
 
-    <!-- ==================== MODAL: ฟอร์มเพิ่มการบ้าน ==================== -->
-    <div id="homework-modal" class="fixed inset-0 z-40 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden transform transition-all">
+    <!-- ==================== MODAL 1: ฟอร์มเพิ่มการบ้าน (พร้อมแนบ ลิงก์ / รูป / ไฟล์) ==================== -->
+    <div id="homework-modal" class="fixed inset-0 z-40 hidden items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity overflow-y-auto">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden my-auto">
             <!-- หัว Modal -->
             <div class="px-6 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <i class="ph-fill ph-pencil-simple-line text-xl"></i>
-                    <h3 class="font-bold text-lg">จดการบ้านใหม่</h3>
+                    <h3 class="font-bold text-lg">จดการบ้าน & แนบรายละเอียด</h3>
                 </div>
                 <button onclick="closeAddModal()" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center transition">
                     <i class="ph-bold ph-x"></i>
@@ -274,7 +306,7 @@
             </div>
 
             <!-- ฟอร์มกรอกข้อมูล -->
-            <form id="homework-form" onsubmit="saveHomework(event)" class="p-6 space-y-4">
+            <form id="homework-form" onsubmit="saveHomework(event)" class="p-5 sm:p-6 space-y-4 max-h-[82vh] overflow-y-auto">
                 
                 <!-- 1. เลือกวิชา (ไม่ต้องพิมพ์เอง) -->
                 <div>
@@ -293,10 +325,10 @@
 
                 <!-- 2. รายละเอียดการบ้าน -->
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">2. รายละเอียดงาน / การบ้าน <span class="text-rose-500">*</span></label>
-                    <input type="text" id="hw-title" required placeholder="เช่น ทำแบบฝึกหัดบทที่ 3, ส่งสไลด์กลุ่ม..." class="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-800 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 transition">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">2. หัวข้อ / รายละเอียดงาน <span class="text-rose-500">*</span></label>
+                    <textarea id="hw-title" rows="2" required placeholder="เช่น ทำแบบฝึกหัดบทที่ 3 ข้อ 1-10, ส่งสไลด์กลุ่ม..." class="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 transition"></textarea>
                     <!-- ตัวช่วยข้อความด่วน -->
-                    <div class="flex flex-wrap gap-1.5 mt-2">
+                    <div class="flex flex-wrap gap-1.5 mt-1.5">
                         <button type="button" onclick="appendQuickText('ทำแบบฝึกหัด ')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition">+ แบบฝึกหัด</button>
                         <button type="button" onclick="appendQuickText('ทำรายงาน/สไลด์ ')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition">+ รายงาน/สไลด์</button>
                         <button type="button" onclick="appendQuickText('สอบย่อย (Quiz) ')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition">+ สอบย่อย</button>
@@ -307,7 +339,51 @@
                 <!-- 3. วันที่กำหนดส่ง -->
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-1.5">3. วันที่กำหนดส่ง <span class="text-rose-500">*</span></label>
-                    <input type="date" id="hw-date" required class="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-800 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 transition">
+                    <input type="date" id="hw-date" required class="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-800 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 transition">
+                </div>
+
+                <!-- 4. ส่วนแนบข้อมูลเพิ่มเติม (ลิงก์ / รูปภาพ / ไฟล์) -->
+                <div class="pt-2 border-t border-slate-100 space-y-3">
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">แนบข้อมูลประกอบ (ไม่บังคับ)</p>
+
+                    <!-- 4.1 แนบลิงก์ URL -->
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
+                        <label class="text-xs font-semibold text-slate-700 flex items-center gap-1.5 mb-1.5">
+                            <i class="ph-bold ph-link text-indigo-600"></i> แนบลิงก์ (Google Drive / Canva / เว็บส่งงาน)
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="url" id="hw-link-input" placeholder="วางลิงก์ https://... ที่นี่" class="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs sm:text-sm focus:border-indigo-500 focus:outline-none">
+                            <button type="button" onclick="addTempLink()" class="px-3.5 py-2 rounded-xl bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs font-bold transition whitespace-nowrap">
+                                + เพิ่มลิงก์
+                            </button>
+                        </div>
+                        <div id="temp-links-list" class="mt-2 space-y-1.5"></div>
+                    </div>
+
+                    <!-- 4.2 ปุ่มอัปโหลดรูปภาพ และ อัปโหลดไฟล์เอกสาร -->
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <!-- ปุ่มเลือกรูปภาพ -->
+                        <label class="flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-dashed border-sky-300 bg-sky-50/50 hover:bg-sky-50 cursor-pointer transition text-center">
+                            <i class="ph-duotone ph-image text-2xl text-sky-600 mb-1"></i>
+                            <span class="text-xs font-bold text-sky-800">เพิ่มรูปภาพโจทย์</span>
+                            <span class="text-[10px] text-sky-600">JPG, PNG (เลือกได้หลายรูป)</span>
+                            <input type="file" id="hw-image-input" accept="image/*" multiple onchange="handleImageUpload(event)" class="hidden">
+                        </label>
+
+                        <!-- ปุ่มเลือกไฟล์เอกสาร -->
+                        <label class="flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/50 hover:bg-amber-50 cursor-pointer transition text-center">
+                            <i class="ph-duotone ph-file-pdf text-2xl text-amber-600 mb-1"></i>
+                            <span class="text-xs font-bold text-amber-800">เพิ่มไฟล์เอกสาร</span>
+                            <span class="text-[10px] text-amber-600">PDF, Word, ZIP ฯลฯ</span>
+                            <input type="file" id="hw-file-input" multiple onchange="handleFileUpload(event)" class="hidden">
+                        </label>
+                    </div>
+
+                    <!-- แสดงตัวอย่างรูปภาพที่เลือกไว้ -->
+                    <div id="temp-images-preview" class="grid grid-cols-3 gap-2"></div>
+
+                    <!-- แสดงรายการไฟล์เอกสารที่เลือกไว้ -->
+                    <div id="temp-files-preview" class="space-y-1.5"></div>
                 </div>
 
                 <!-- ปุ่มบันทึก -->
@@ -315,12 +391,80 @@
                     <button type="button" onclick="closeAddModal()" class="flex-1 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition">
                         ยกเลิก
                     </button>
-                    <button type="submit" class="flex-1 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-lg shadow-indigo-200 transition flex items-center justify-center gap-1.5">
+                    <button type="submit" id="btn-save-hw" class="flex-1 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-lg shadow-indigo-200 transition flex items-center justify-center gap-1.5">
                         <i class="ph-bold ph-check"></i> บันทึกการบ้าน
                     </button>
                 </div>
             </form>
         </div>
+    </div>
+
+    <!-- ==================== MODAL 2: หน้าต่างดูรายละเอียดการบ้าน (HOMEWORK DETAIL VIEWER) ==================== -->
+    <div id="detail-modal" class="fixed inset-0 z-40 hidden items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity overflow-y-auto">
+        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden my-auto">
+            <!-- แถบสีด้านบนตามวิชา -->
+            <div id="detail-header-bar" class="px-6 py-4 bg-indigo-600 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span id="detail-subject-code" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-white/20 backdrop-blur-sm">MAE67-112</span>
+                    <span id="detail-due-date" class="text-xs font-medium text-white/90">ส่ง 27 พ.ย. 2569</span>
+                </div>
+                <button onclick="closeDetailModal()" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center transition">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
+                <!-- ชื่อวิชาและรายละเอียดงาน -->
+                <div>
+                    <p id="detail-subject-name" class="text-xs font-bold text-slate-500 mb-1">แคลคูลัสขั้นกลาง</p>
+                    <h3 id="detail-title" class="text-lg sm:text-xl font-bold text-slate-800 leading-snug whitespace-pre-line">
+                        รายละเอียดการบ้าน
+                    </h3>
+                </div>
+
+                <!-- ส่วนแสดงลิงก์ที่แนบ -->
+                <div id="detail-links-section" class="hidden space-y-2">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="ph-bold ph-link text-indigo-600"></i> ลิงก์ที่แนบไว้
+                    </h4>
+                    <div id="detail-links-list" class="space-y-2"></div>
+                </div>
+
+                <!-- ส่วนแสดงรูปภาพที่แนบ -->
+                <div id="detail-images-section" class="hidden space-y-2">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="ph-bold ph-image text-sky-600"></i> รูปภาพประกอบ (คลิกที่รูปเพื่อขยาย)
+                    </h4>
+                    <div id="detail-images-grid" class="grid grid-cols-2 gap-2.5"></div>
+                </div>
+
+                <!-- ส่วนแสดงไฟล์เอกสารที่แนบ -->
+                <div id="detail-files-section" class="hidden space-y-2">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="ph-bold ph-file-arrow-down text-amber-600"></i> ไฟล์เอกสารแนบ
+                    </h4>
+                    <div id="detail-files-list" class="space-y-2"></div>
+                </div>
+
+                <!-- ปุ่มจัดการสถานะด้านล่าง -->
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+                    <button id="detail-delete-btn" class="px-4 py-2.5 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5">
+                        <i class="ph-bold ph-trash"></i> ลบงานนี้
+                    </button>
+                    <button id="detail-toggle-btn" class="flex-1 py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold shadow-md transition flex items-center justify-center gap-1.5">
+                        <i class="ph-bold ph-check-circle"></i> ทำเสร็จแล้ว
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== LIGHTBOX: ดูรูปภาพขยายเต็มจอ ==================== -->
+    <div id="image-lightbox" onclick="closeLightbox()" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
+        <button onclick="closeLightbox()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center text-xl transition">
+            <i class="ph-bold ph-x"></i>
+        </button>
+        <img id="lightbox-img" src="" alt="ขยายรูปภาพ" class="max-w-full max-h-[90vh] rounded-2xl shadow-2xl object-contain" onclick="event.stopPropagation()">
     </div>
 
     <!-- ==================== TOAST NOTIFICATION (แจ้งเตือนมุมล่าง) ==================== -->
@@ -343,7 +487,7 @@
                 text: 'text-sky-800',
                 border: 'border-sky-300',
                 dot: 'bg-sky-500',
-                badge: 'bg-sky-500 text-white'
+                badge: 'bg-sky-600 text-white'
             },
             {
                 code: 'EDU67-113',
@@ -354,7 +498,7 @@
                 text: 'text-amber-800',
                 border: 'border-amber-300',
                 dot: 'bg-amber-500',
-                badge: 'bg-amber-500 text-white'
+                badge: 'bg-amber-600 text-white'
             },
             {
                 code: 'MAE67-112',
@@ -365,7 +509,7 @@
                 text: 'text-rose-800',
                 border: 'border-rose-300',
                 dot: 'bg-rose-500',
-                badge: 'bg-rose-500 text-white'
+                badge: 'bg-rose-600 text-white'
             },
             {
                 code: 'MAE67-131',
@@ -376,7 +520,7 @@
                 text: 'text-purple-800',
                 border: 'border-purple-300',
                 dot: 'bg-purple-500',
-                badge: 'bg-purple-500 text-white'
+                badge: 'bg-purple-600 text-white'
             },
             {
                 code: 'GEN67-111',
@@ -387,7 +531,7 @@
                 text: 'text-emerald-800',
                 border: 'border-emerald-300',
                 dot: 'bg-emerald-500',
-                badge: 'bg-emerald-500 text-white'
+                badge: 'bg-emerald-600 text-white'
             },
             {
                 code: 'INF67-171',
@@ -398,7 +542,7 @@
                 text: 'text-indigo-800',
                 border: 'border-indigo-300',
                 dot: 'bg-indigo-500',
-                badge: 'bg-indigo-500 text-white'
+                badge: 'bg-indigo-600 text-white'
             },
             {
                 code: 'GEN67-122',
@@ -409,7 +553,7 @@
                 text: 'text-pink-800',
                 border: 'border-pink-300',
                 dot: 'bg-pink-500',
-                badge: 'bg-pink-500 text-white'
+                badge: 'bg-pink-600 text-white'
             },
             {
                 code: 'MAE67-151',
@@ -420,7 +564,7 @@
                 text: 'text-teal-800',
                 border: 'border-teal-300',
                 dot: 'bg-teal-500',
-                badge: 'bg-teal-500 text-white'
+                badge: 'bg-teal-600 text-white'
             },
             {
                 code: 'CSP67-163',
@@ -431,49 +575,112 @@
                 text: 'text-orange-800',
                 border: 'border-orange-300',
                 dot: 'bg-orange-500',
-                badge: 'bg-orange-500 text-white'
+                badge: 'bg-orange-600 text-white'
             }
         ];
 
         // =========================================================================
-        // 2. ข้อมูลตารางเรียนครบทั้ง 5 วัน (จันทร์ - ศุกร์) ตามภาพ 100%
+        // 2. ข้อมูลตารางเรียนครบทั้ง 5 วัน (เพิ่ม startHour และ duration เพื่อวาด Grid)
         // =========================================================================
         const CLASS_SCHEDULE = [
             // วันจันทร์
-            { day: 'จันทร์', time: '08:00 - 10:00', room: 'NG1204', code: 'GEN68-126', group: '64' },
-            { day: 'จันทร์', time: '10:00 - 12:00', room: 'AD1305', code: 'EDU67-113', group: '14' },
-            { day: 'จันทร์', time: '13:00 - 15:00', room: 'NG1404', code: 'MAE67-112', group: '4' },
-            { day: 'จันทร์', time: '15:00 - 17:00', room: 'NG1205', code: 'MAE67-131', group: '1' },
+            { day: 'จันทร์', startHour: 8, duration: 2, time: '08:00 - 10:00', room: 'NG1204', code: 'GEN68-126', group: '64' },
+            { day: 'จันทร์', startHour: 10, duration: 2, time: '10:00 - 12:00', room: 'AD1305', code: 'EDU67-113', group: '14' },
+            { day: 'จันทร์', startHour: 13, duration: 2, time: '13:00 - 15:00', room: 'NG1404', code: 'MAE67-112', group: '4' },
+            { day: 'จันทร์', startHour: 15, duration: 2, time: '15:00 - 17:00', room: 'NG1205', code: 'MAE67-131', group: '1' },
             // วันอังคาร
-            { day: 'อังคาร', time: '08:00 - 10:00', room: 'AD1105', code: 'GEN67-111', group: '11' },
-            { day: 'อังคาร', time: '10:00 - 12:00', room: 'AD1311', code: 'INF67-171', group: '15' },
-            { day: 'อังคาร', time: '15:00 - 18:00', room: 'NG1102', code: 'GEN67-122', group: '1' },
+            { day: 'อังคาร', startHour: 8, duration: 2, time: '08:00 - 10:00', room: 'AD1105', code: 'GEN67-111', group: '11' },
+            { day: 'อังคาร', startHour: 10, duration: 2, time: '10:00 - 12:00', room: 'AD1311', code: 'INF67-171', group: '15' },
+            { day: 'อังคาร', startHour: 15, duration: 3, time: '15:00 - 18:00', room: 'NG1102', code: 'GEN67-122', group: '1' },
             // วันพุธ
-            { day: 'พุธ', time: '08:00 - 10:00', room: 'ST407', code: 'MAE67-151', group: '1' },
-            { day: 'พุธ', time: '10:00 - 12:00', room: 'NG1405', code: 'EDU67-113', group: '14' },
+            { day: 'พุธ', startHour: 8, duration: 2, time: '08:00 - 10:00', room: 'ST407', code: 'MAE67-151', group: '1' },
+            { day: 'พุธ', startHour: 10, duration: 2, time: '10:00 - 12:00', room: 'NG1405', code: 'EDU67-113', group: '14' },
             // วันพฤหัสบดี
-            { day: 'พฤหัสบดี', time: '08:00 - 10:00', room: 'NG1205', code: 'MAE67-131', group: '1' },
-            { day: 'พฤหัสบดี', time: '13:00 - 15:00', room: 'อ.วิทยาศาสตร์การกีฬา', code: 'CSP67-163', group: '6' },
+            { day: 'พฤหัสบดี', startHour: 8, duration: 2, time: '08:00 - 10:00', room: 'NG1205', code: 'MAE67-131', group: '1' },
+            { day: 'พฤหัสบดี', startHour: 13, duration: 2, time: '13:00 - 15:00', room: 'อ.วิทยาศาสตร์การกีฬา', code: 'CSP67-163', group: '6' },
             // วันศุกร์
-            { day: 'ศุกร์', time: '08:00 - 10:00', room: 'ST411', code: 'MAE67-151', group: '1' },
-            { day: 'ศุกร์', time: '13:00 - 14:00', room: 'NG1404', code: 'MAE67-112', group: '4' },
-            { day: 'ศุกร์', time: '15:00 - 17:00', room: 'NG1102', code: 'GEN67-122', group: '1' }
+            { day: 'ศุกร์', startHour: 8, duration: 2, time: '08:00 - 10:00', room: 'ST411', code: 'MAE67-151', group: '1' },
+            { day: 'ศุกร์', startHour: 13, duration: 1, time: '13:00 - 14:00', room: 'NG1404', code: 'MAE67-112', group: '4' },
+            { day: 'ศุกร์', startHour: 15, duration: 2, time: '15:00 - 17:00', room: 'NG1102', code: 'GEN67-122', group: '1' }
         ];
 
         // =========================================================================
-        // 3. ตัวแปรสถานะ (STATE MANAGEMENT)
+        // 3. ระบบฐานข้อมูล INDEXEDDB (รองรับไฟล์ขนาดใหญ่ รูปภาพ และลิงก์)
         // =========================================================================
-        const STORAGE_KEY = 'studymate_homeworks_v1';
-        
-        // ตั้งค่าวันที่ปัจจุบันเป็น 25 พฤศจิกายน 2026 (หรือดึงจากระบบจริงหากอยู่ในช่วงเวลา)
-        const TODAY_OBJ = new Date(2026, 10, 25); // เดือน 10 คือ พฤศจิกายน (0-indexed)
+        const DB_NAME = 'StudyMateDB_v2';
+        const STORE_NAME = 'homeworks';
+        let dbInstance = null;
+
+        function initDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, 1);
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                    }
+                };
+                request.onsuccess = (event) => {
+                    dbInstance = event.target.result;
+                    resolve(dbInstance);
+                };
+                request.onerror = (event) => {
+                    console.error('IndexedDB error:', event.target.error);
+                    reject(event.target.error);
+                };
+            });
+        }
+
+        function dbGetAllHomeworks() {
+            return new Promise((resolve) => {
+                if (!dbInstance) return resolve([]);
+                const tx = dbInstance.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => resolve([]);
+            });
+        }
+
+        function dbPutHomework(hwObj) {
+            return new Promise((resolve, reject) => {
+                if (!dbInstance) return reject('No DB');
+                const tx = dbInstance.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.put(hwObj);
+                req.onsuccess = () => resolve(true);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        function dbDeleteHomework(id) {
+            return new Promise((resolve, reject) => {
+                if (!dbInstance) return reject('No DB');
+                const tx = dbInstance.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.delete(id);
+                req.onsuccess = () => resolve(true);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        // =========================================================================
+        // 4. ตัวแปรสถานะ (STATE MANAGEMENT)
+        // =========================================================================
+        const TODAY_OBJ = new Date(2026, 10, 26); // พฤหัสบดีที่ 26 พฤศจิกายน 2026
         const TODAY_STR = formatDateISO(TODAY_OBJ);
 
         let currentYear = TODAY_OBJ.getFullYear();
         let currentMonth = TODAY_OBJ.getMonth();
         let selectedDateStr = TODAY_STR;
+        let currentScheduleMode = 'grid'; // 'grid' หรือ 'list'
         let currentScheduleFilter = 'ALL';
         let homeworks = [];
+
+        // ตัวแปรชั่วคราวสำหรับฟอร์มเพิ่มการบ้าน
+        let tempLinks = [];
+        let tempImages = []; // เก็บ { name, dataUrl }
+        let tempFiles = [];  // เก็บ { name, type, size, blob }
 
         const THAI_MONTHS = [
             'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
@@ -482,32 +689,65 @@
         const THAI_DAYS_FULL = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
 
         // =========================================================================
-        // 4. การเริ่มต้นทำงาน (INITIALIZATION)
+        // 5. การเริ่มต้นทำงาน (INITIALIZATION)
         // =========================================================================
-        window.addEventListener('DOMContentLoaded', () => {
-            // เริ่มต้นแถบโหลด Splash Screen
+        window.addEventListener('DOMContentLoaded', async () => {
             setTimeout(() => {
                 document.getElementById('splash-progress').style.width = '100%';
             }, 100);
 
             setTimeout(() => {
                 hideSplash();
-            }, 1800);
+            }, 1500);
 
-            // โหลดข้อมูลการบ้านจาก localStorage
-            loadHomeworks();
+            try {
+                await initDatabase();
+                homeworks = await dbGetAllHomeworks();
 
-            // สร้างตัวเลือกวิชาในฟอร์ม
+                // ถ้าเปิดครั้งแรกยังไม่มีข้อมูล ให้ใส่ตัวอย่าง 2 งานพร้อมลิงก์ให้ดูเป็นแนวทาง
+                if (homeworks.length === 0) {
+                    const samples = [
+                        {
+                            id: 'sample-1',
+                            subjectCode: 'MAE67-112',
+                            title: 'แบบฝึกหัดแคลคูลัส บทที่ 3 (ส่งท้ายคาบในห้อง NG1404)',
+                            date: '2026-11-27',
+                            completed: false,
+                            links: ['https://classroom.google.com'],
+                            images: [],
+                            files: []
+                        },
+                        {
+                            id: 'sample-2',
+                            subjectCode: 'INF67-171',
+                            title: 'ออกแบบอินโฟกราฟิกหัวข้อ AI ในยุคดิจิทัล',
+                            date: '2026-11-26',
+                            completed: false,
+                            links: ['https://www.canva.com'],
+                            images: [],
+                            files: []
+                        }
+                    ];
+                    for (const item of samples) {
+                        await dbPutHomework(item);
+                    }
+                    homeworks = samples;
+                }
+            } catch (err) {
+                console.error('DB Init failed:', err);
+            }
+
             populateSubjectSelect();
 
-            // วาดปฏิทินและรายการงาน
+            // วาดหน้าตารางเรียน (หน้าเริ่มต้น)
+            renderScheduleTimetableGrid();
+            renderScheduleList();
+            renderSubjectsLegend();
+
+            // วาดหน้าปฏิทินการบ้านเตรียมไว้
             renderCalendar();
             renderSelectedDayTasks();
             renderUpcomingTasks();
-
-            // วาดตารางเรียน
-            renderSchedule();
-            renderSubjectsLegend();
         });
 
         function hideSplash() {
@@ -516,49 +756,7 @@
             splash.style.opacity = '0';
             setTimeout(() => {
                 splash.classList.add('hidden');
-            }, 500);
-        }
-
-        // =========================================================================
-        // 5. จัดการข้อมูล LOCALSTORAGE
-        // =========================================================================
-        function loadHomeworks() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY);
-                if (raw) {
-                    homeworks = JSON.parse(raw);
-                } else {
-                    // ใส่ตัวอย่างการบ้านเริ่มต้นให้ 2 รายการในเดือนพฤศจิกายน 2026
-                    homeworks = [
-                        {
-                            id: 'sample-1',
-                            subjectCode: 'MAE67-112',
-                            title: 'แบบฝึกหัดแคลคูลัส บทที่ 3 (ส่งท้ายคาบ)',
-                            date: '2026-11-27',
-                            completed: false
-                        },
-                        {
-                            id: 'sample-2',
-                            subjectCode: 'INF67-171',
-                            title: 'สรุปอินโฟกราฟิกหัวข้อ AI ในชีวิตประจำวัน',
-                            date: '2026-11-25',
-                            completed: false
-                        }
-                    ];
-                    saveToStorage();
-                }
-            } catch (e) {
-                console.error('Error loading homeworks:', e);
-                homeworks = [];
-            }
-        }
-
-        function saveToStorage() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(homeworks));
-            } catch (e) {
-                showToast('ไม่สามารถบันทึกข้อมูลลงเครื่องได้', 'error');
-            }
+            }, 450);
         }
 
         function getSubjectByCode(code) {
@@ -574,23 +772,226 @@
             const btnCalendar = document.getElementById('tab-calendar');
             const btnSchedule = document.getElementById('tab-schedule');
 
-            if (tabName === 'calendar') {
+            if (tabName === 'schedule') {
+                viewSchedule.classList.remove('hidden');
+                viewCalendar.classList.add('hidden');
+
+                btnSchedule.className = 'flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all bg-white text-indigo-600 shadow-sm';
+                btnCalendar.className = 'flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all text-slate-600 hover:text-slate-900';
+            } else {
                 viewCalendar.classList.remove('hidden');
                 viewSchedule.classList.add('hidden');
 
                 btnCalendar.className = 'flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all bg-white text-indigo-600 shadow-sm';
                 btnSchedule.className = 'flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all text-slate-600 hover:text-slate-900';
-            } else {
-                viewCalendar.classList.add('hidden');
-                viewSchedule.classList.remove('hidden');
-
-                btnSchedule.className = 'flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all bg-white text-indigo-600 shadow-sm';
-                btnCalendar.className = 'flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all text-slate-600 hover:text-slate-900';
             }
         }
 
         // =========================================================================
-        // 7. ระบบปฏิทินการบ้าน (CALENDAR LOGIC)
+        // 7. ระบบตารางเรียนแบบ GRID รายสัปดาห์ & แบบรายการ (CLASS SCHEDULE)
+        // =========================================================================
+        function setScheduleMode(mode) {
+            currentScheduleMode = mode;
+            const gridWrapper = document.getElementById('schedule-grid-wrapper');
+            const listContainer = document.getElementById('schedule-list-container');
+            const filterWrapper = document.getElementById('day-filter-wrapper');
+            const btnGrid = document.getElementById('btn-mode-grid');
+            const btnList = document.getElementById('btn-mode-list');
+
+            if (mode === 'grid') {
+                gridWrapper.classList.remove('hidden');
+                listContainer.classList.add('hidden');
+                filterWrapper.classList.add('hidden');
+
+                btnGrid.className = 'flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-white text-indigo-600 shadow-sm transition';
+                btnList.className = 'flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition';
+            } else {
+                gridWrapper.classList.add('hidden');
+                listContainer.classList.remove('hidden');
+                filterWrapper.classList.remove('hidden');
+
+                btnList.className = 'flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-white text-indigo-600 shadow-sm transition';
+                btnGrid.className = 'flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 transition';
+            }
+        }
+
+        function renderScheduleTimetableGrid() {
+            const container = document.getElementById('schedule-timetable-grid');
+            const daysOrder = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์'];
+            const hours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17]; // 08:00 ถึง 18:00 (10 ช่อง)
+            const todayDayName = THAI_DAYS_FULL[TODAY_OBJ.getDay()];
+
+            document.getElementById('current-day-indicator').textContent = `วันนี้: วัน${todayDayName}`;
+
+            // หัวตารางแสดงช่วงเวลา 08:00 - 18:00
+            let html = `
+                <div class="grid grid-cols-[95px_repeat(10,minmax(0,1fr))] bg-slate-100/90 border-b border-slate-200 text-center">
+                    <div class="p-3 font-bold text-xs text-slate-600 flex items-center justify-center border-r border-slate-200 bg-slate-50">
+                        วัน / เวลา
+                    </div>
+                    ${hours.map(h => `
+                        <div class="py-2.5 px-1 text-[11px] font-bold text-slate-600 border-r border-slate-200/70 last:border-r-0 ${h === 12 ? 'bg-slate-200/50 text-slate-400' : ''}">
+                            ${String(h).padStart(2, '0')}:00<br>
+                            <span class="text-[9px] font-normal text-slate-400">-${String(h + 1).padStart(2, '0')}:00</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            // แถวของแต่ละวัน จันทร์ - ศุกร์
+            daysOrder.forEach(dayName => {
+                const isToday = dayName === todayDayName;
+                const dayClasses = CLASS_SCHEDULE.filter(c => c.day === dayName);
+
+                html += `
+                    <div class="grid grid-cols-[95px_repeat(10,minmax(0,1fr))] border-b border-slate-200/80 last:border-b-0 min-h-[96px] ${isToday ? 'bg-indigo-50/30' : 'bg-white'}">
+                        <!-- คอลัมน์ชื่อวัน -->
+                        <div class="p-2.5 border-r border-slate-200 flex flex-col items-center justify-center text-center ${isToday ? 'bg-indigo-600 text-white' : 'bg-slate-50/70 text-slate-700'}">
+                            <span class="font-bold text-sm">${dayName}</span>
+                            ${isToday ? '<span class="mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-white text-indigo-600">วันนี้</span>' : ''}
+                        </div>
+                `;
+
+                // วนลูปสร้างช่องเวลา 08:00 - 17:00 (10 ช่อง)
+                let h = 8;
+                while (h <= 17) {
+                    const cls = dayClasses.find(c => c.startHour === h);
+                    if (cls) {
+                        const subj = getSubjectByCode(cls.code);
+                        const span = cls.duration;
+                        html += `
+                            <div style="grid-column: span ${span} / span ${span};" class="p-1.5 border-r border-slate-200/70 last:border-r-0 flex">
+                                <div onclick="quickAddFromSchedule('${cls.code}')" title="คลิกเพื่อจดการบ้านวิชา ${subj.name}" class="w-full rounded-2xl p-2 border ${subj.bg} ${subj.border} hover:shadow-md hover:scale-[1.01] transition cursor-pointer flex flex-col justify-between group">
+                                    <div>
+                                        <div class="flex items-center justify-between gap-1 mb-0.5">
+                                            <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${subj.badge}">${cls.code}</span>
+                                            <span class="text-[10px] font-semibold ${subj.text} opacity-80">ก.${cls.group}</span>
+                                        </div>
+                                        <p class="text-[11px] sm:text-xs font-bold ${subj.text} leading-tight line-clamp-2">
+                                            ${subj.shortName}
+                                        </p>
+                                    </div>
+                                    <div class="mt-1.5 pt-1 border-t border-black/5 flex items-center justify-between text-[10px] font-semibold ${subj.text}">
+                                        <span class="truncate"><i class="ph-fill ph-map-pin mr-0.5"></i>${cls.room}</span>
+                                        <i class="ph-bold ph-plus-circle opacity-0 group-hover:opacity-100 transition text-xs"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        h += span;
+                    } else {
+                        // ช่องว่าง (หรือพักเที่ยง 12:00-13:00)
+                        const isLunch = h === 12;
+                        html += `
+                            <div class="border-r border-slate-100 last:border-r-0 flex items-center justify-center ${isLunch ? 'bg-slate-100/60' : ''}">
+                                ${isLunch ? '<span class="text-[10px] text-slate-400 font-medium select-none">พัก</span>' : ''}
+                            </div>
+                        `;
+                        h += 1;
+                    }
+                }
+
+                html += `</div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function filterSchedule(day) {
+            currentScheduleFilter = day;
+            document.querySelectorAll('.day-filter-btn').forEach(btn => {
+                if (btn.dataset.day === day) {
+                    btn.className = 'day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-indigo-600 text-white shadow-sm whitespace-nowrap transition';
+                } else {
+                    btn.className = 'day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition';
+                }
+            });
+            renderScheduleList();
+        }
+
+        function renderScheduleList() {
+            const container = document.getElementById('schedule-list-container');
+            const daysOrder = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์'];
+            const todayDayName = THAI_DAYS_FULL[TODAY_OBJ.getDay()];
+            const daysToRender = currentScheduleFilter === 'ALL' ? daysOrder : [currentScheduleFilter];
+
+            container.innerHTML = daysToRender.map(dayName => {
+                const classes = CLASS_SCHEDULE.filter(c => c.day === dayName);
+                const isToday = dayName === todayDayName;
+
+                return `
+                    <div class="bg-white rounded-3xl shadow-sm border ${isToday ? 'border-indigo-300 ring-2 ring-indigo-100' : 'border-slate-200/70'} overflow-hidden">
+                        <div class="px-5 py-3.5 ${isToday ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-800 border-b border-slate-200/70'} flex items-center justify-between">
+                            <div class="flex items-center gap-2.5">
+                                <span class="font-bold text-base sm:text-lg">วัน${dayName}</span>
+                                ${isToday ? '<span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-white text-indigo-600">วันนี้</span>' : ''}
+                            </div>
+                            <span class="text-xs font-medium ${isToday ? 'text-indigo-100' : 'text-slate-500'}">
+                                ${classes.length} คาบเรียน
+                            </span>
+                        </div>
+
+                        <div class="divide-y divide-slate-100">
+                            ${classes.map(cls => {
+                                const subj = getSubjectByCode(cls.code);
+                                return `
+                                    <div class="p-4 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/80 transition">
+                                        <div class="flex items-start sm:items-center gap-3.5">
+                                            <div class="w-1.5 h-12 rounded-full ${subj.dot} flex-shrink-0 mt-1 sm:mt-0"></div>
+                                            <div>
+                                                <div class="flex flex-wrap items-center gap-2 mb-1">
+                                                    <span class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700">
+                                                        <i class="ph-bold ph-clock text-indigo-500"></i> ${cls.time}
+                                                    </span>
+                                                    <span class="text-xs font-bold px-2.5 py-0.5 rounded-lg ${subj.bg} ${subj.text}">
+                                                        ${cls.code}
+                                                    </span>
+                                                    <span class="text-xs font-medium text-slate-500">
+                                                        กลุ่ม ${cls.group}
+                                                    </span>
+                                                </div>
+                                                <h4 class="font-bold text-slate-800 text-sm sm:text-base">${subj.name}</h4>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center justify-between sm:justify-end gap-3 pl-5 sm:pl-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                                            <div class="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl">
+                                                <i class="ph-fill ph-map-pin text-rose-500"></i>
+                                                <span>ห้อง ${cls.room}</span>
+                                            </div>
+                                            <button onclick="quickAddFromSchedule('${cls.code}')" class="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white transition">
+                                                <i class="ph-bold ph-plus"></i> จดการบ้าน
+                                            </button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function quickAddFromSchedule(subjectCode) {
+            openAddModal(selectedDateStr, subjectCode);
+        }
+
+        function renderSubjectsLegend() {
+            const container = document.getElementById('subjects-legend');
+            container.innerHTML = SUBJECTS.map(s => `
+                <div onclick="quickAddFromSchedule('${s.code}')" class="flex items-center gap-2.5 p-2.5 rounded-2xl border ${s.border} ${s.bg}/40 hover:bg-opacity-70 cursor-pointer transition">
+                    <span class="w-3 h-3 rounded-full ${s.dot} flex-shrink-0"></span>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-xs font-bold ${s.text}">${s.code} (กลุ่ม ${s.group})</p>
+                        <p class="text-xs text-slate-700 truncate">${s.name}</p>
+                    </div>
+                    <i class="ph-bold ph-plus text-xs ${s.text} opacity-60"></i>
+                </div>
+            `).join('');
+        }
+
+        // =========================================================================
+        // 8. ระบบปฏิทินการบ้าน (CALENDAR & TASK LISTS)
         // =========================================================================
         function formatDateISO(dateObj) {
             const y = dateObj.getFullYear();
@@ -641,18 +1042,15 @@
             const gridEl = document.getElementById('calendar-grid');
             gridEl.innerHTML = '';
 
-            // วันแรกของเดือน และจำนวนวันในเดือน
             const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-            // ช่องว่างก่อนวันที่ 1
             for (let i = 0; i < firstDayOfMonth; i++) {
                 const emptyCell = document.createElement('div');
                 emptyCell.className = 'calendar-cell bg-slate-50/60 p-1.5';
                 gridEl.appendChild(emptyCell);
             }
 
-            // วาดวันที่ 1 ถึงวันสุดท้ายของเดือน
             for (let day = 1; day <= daysInMonth; day++) {
                 const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dayTasks = homeworks.filter(hw => hw.date === dateStr);
@@ -670,7 +1068,6 @@
                 }
                 cell.className = cellClasses;
 
-                // ส่วนหัวช่องวันที่ (ตัวเลขวันที่ + ปุ่ม + เล็กๆ เมื่อโฮเวอร์)
                 const topRow = document.createElement('div');
                 topRow.className = 'flex items-center justify-between mb-1';
 
@@ -683,7 +1080,6 @@
                 }
                 topRow.appendChild(numSpan);
 
-                // ปุ่มเพิ่มด่วนเมื่อเอาเมาส์ชี้บนคอม
                 const quickAddBtn = document.createElement('button');
                 quickAddBtn.type = 'button';
                 quickAddBtn.innerHTML = '<i class="ph-bold ph-plus text-[10px]"></i>';
@@ -698,15 +1094,20 @@
 
                 cell.appendChild(topRow);
 
-                // แสดงรายการการบ้านในช่องปฏิทิน
                 const tasksContainer = document.createElement('div');
                 tasksContainer.className = 'space-y-1 overflow-hidden';
 
                 dayTasks.slice(0, 3).forEach(task => {
                     const subj = getSubjectByCode(task.subjectCode);
+                    const hasAttachment = (task.links?.length || 0) + (task.images?.length || 0) + (task.files?.length || 0) > 0;
                     const pill = document.createElement('div');
-                    pill.className = `text-[10px] sm:text-xs px-1.5 py-0.5 rounded-md truncate font-medium border ${subj.bg} ${subj.text} ${subj.border} ${task.completed ? 'opacity-50 line-through' : ''}`;
-                    pill.textContent = `${subj.code.split('-')[0]}: ${task.title}`;
+                    pill.onclick = (e) => {
+                        e.stopPropagation();
+                        selectDate(dateStr);
+                        openDetailModal(task.id);
+                    };
+                    pill.className = `text-[10px] sm:text-xs px-1.5 py-0.5 rounded-md truncate font-medium border hover:brightness-95 transition flex items-center gap-1 ${subj.bg} ${subj.text} ${subj.border} ${task.completed ? 'opacity-50 line-through' : ''}`;
+                    pill.innerHTML = `${hasAttachment ? '<i class="ph-bold ph-paperclip flex-shrink-0"></i>' : ''}<span class="truncate">${subj.code.split('-')[0]}: ${escapeHTML(task.title)}</span>`;
                     tasksContainer.appendChild(pill);
                 });
 
@@ -721,9 +1122,28 @@
                 gridEl.appendChild(cell);
             }
 
-            // อัปเดตตัวเลขงานค้างส่งทั้งหมด
             const pendingCount = homeworks.filter(h => !h.completed).length;
             document.getElementById('pending-count-badge').textContent = `ค้างส่ง ${pendingCount} งาน`;
+        }
+
+        function renderAttachmentBadges(task) {
+            const linksCount = task.links ? task.links.length : 0;
+            const imgsCount = task.images ? task.images.length : 0;
+            const filesCount = task.files ? task.files.length : 0;
+            if (linksCount + imgsCount + filesCount === 0) return '';
+
+            let badges = '<div class="flex flex-wrap items-center gap-1.5 mt-1.5">';
+            if (linksCount > 0) {
+                badges += `<span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200/60"><i class="ph-bold ph-link"></i> ${linksCount} ลิงก์</span>`;
+            }
+            if (imgsCount > 0) {
+                badges += `<span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 border border-sky-200/60"><i class="ph-bold ph-image"></i> ${imgsCount} รูป</span>`;
+            }
+            if (filesCount > 0) {
+                badges += `<span class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200/60"><i class="ph-bold ph-file-text"></i> ${filesCount} ไฟล์</span>`;
+            }
+            badges += '</div>';
+            return badges;
         }
 
         function renderSelectedDayTasks() {
@@ -747,9 +1167,9 @@
             listEl.innerHTML = tasks.map(task => {
                 const subj = getSubjectByCode(task.subjectCode);
                 return `
-                    <div class="flex items-start justify-between gap-3 p-3.5 rounded-2xl border transition ${task.completed ? 'bg-slate-50 border-slate-200/70 opacity-75' : 'bg-white border-slate-200 shadow-sm'}">
+                    <div onclick="openDetailModal('${task.id}')" class="flex items-start justify-between gap-3 p-3.5 rounded-2xl border cursor-pointer transition ${task.completed ? 'bg-slate-50 border-slate-200/70 opacity-75' : 'bg-white border-slate-200 hover:border-indigo-300 shadow-sm'}">
                         <div class="flex items-start gap-3 flex-1 min-w-0">
-                            <button onclick="toggleComplete('${task.id}')" class="mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition flex-shrink-0 ${task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 hover:border-indigo-500'}">
+                            <button onclick="event.stopPropagation(); toggleComplete('${task.id}')" class="mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition flex-shrink-0 ${task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 hover:border-indigo-500'}">
                                 ${task.completed ? '<i class="ph-bold ph-check text-xs"></i>' : ''}
                             </button>
                             <div class="min-w-0 flex-1">
@@ -764,11 +1184,15 @@
                                 <p class="text-sm font-semibold text-slate-800 break-words ${task.completed ? 'line-through text-slate-400' : ''}">
                                     ${escapeHTML(task.title)}
                                 </p>
+                                ${renderAttachmentBadges(task)}
                             </div>
                         </div>
-                        <button onclick="deleteHomework('${task.id}')" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition flex-shrink-0" title="ลบรายการนี้">
-                            <i class="ph-bold ph-trash text-base"></i>
-                        </button>
+                        <div class="flex items-center gap-1 flex-shrink-0">
+                            <span class="text-xs text-indigo-600 font-medium px-2 py-1 rounded-lg bg-indigo-50 hidden sm:inline">ดูรายละเอียด</span>
+                            <button onclick="event.stopPropagation(); deleteHomework('${task.id}')" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="ลบรายการนี้">
+                                <i class="ph-bold ph-trash text-base"></i>
+                            </button>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -794,13 +1218,17 @@
                 const subj = getSubjectByCode(task.subjectCode);
                 const [y, m, d] = task.date.split('-').map(Number);
                 const shortThaiDate = `${d} ${THAI_MONTHS[m - 1].slice(0, 3)} ${String(y + 543).slice(-2)}`;
+                const hasAttachment = (task.links?.length || 0) + (task.images?.length || 0) + (task.files?.length || 0) > 0;
 
                 return `
-                    <div onclick="jumpToTaskDate('${task.date}')" class="p-3 rounded-2xl border border-slate-200/80 hover:border-indigo-300 bg-slate-50/50 hover:bg-indigo-50/30 cursor-pointer transition flex items-center justify-between gap-2.5">
+                    <div onclick="openDetailModal('${task.id}')" class="p-3 rounded-2xl border border-slate-200/80 hover:border-indigo-300 bg-slate-50/50 hover:bg-indigo-50/30 cursor-pointer transition flex items-center justify-between gap-2.5">
                         <div class="flex items-center gap-2.5 min-w-0">
                             <span class="w-2.5 h-8 rounded-full ${subj.dot} flex-shrink-0"></span>
                             <div class="min-w-0">
-                                <p class="text-xs font-bold ${subj.text}">${subj.code} · ${subj.shortName}</p>
+                                <p class="text-xs font-bold ${subj.text} flex items-center gap-1">
+                                    <span>${subj.code} · ${subj.shortName}</span>
+                                    ${hasAttachment ? '<i class="ph-bold ph-paperclip text-slate-400"></i>' : ''}
+                                </p>
                                 <p class="text-sm font-medium text-slate-800 truncate">${escapeHTML(task.title)}</p>
                             </div>
                         </div>
@@ -812,17 +1240,8 @@
             }).join('');
         }
 
-        function jumpToTaskDate(dateStr) {
-            const [y, m] = dateStr.split('-').map(Number);
-            currentYear = y;
-            currentMonth = m - 1;
-            selectedDateStr = dateStr;
-            renderCalendar();
-            renderSelectedDayTasks();
-        }
-
         // =========================================================================
-        // 8. จัดการฟอร์มเพิ่ม / ติ๊กถูก / ลบ การบ้าน
+        // 9. จัดการฟอร์มเพิ่มการบ้าน + แนบ ลิงก์ / รูปภาพ / ไฟล์เอกสาร
         // =========================================================================
         function populateSubjectSelect() {
             const selectEl = document.getElementById('hw-subject');
@@ -832,7 +1251,6 @@
                 <option value="${s.code}">${s.code} - ${s.name} (กลุ่ม ${s.group})</option>
             `).join('');
 
-            // สร้างปุ่มกดเลือกวิชาด่วน (ไม่ต้องเปิด Dropdown)
             chipsEl.innerHTML = SUBJECTS.map(s => `
                 <button type="button" onclick="selectQuickSubject('${s.code}')" class="text-[11px] font-medium px-2.5 py-1 rounded-lg border transition ${s.bg} ${s.text} ${s.border} hover:opacity-80">
                     ${s.code}
@@ -858,9 +1276,16 @@
 
             dateInput.value = preselectDate || selectedDateStr || TODAY_STR;
             titleInput.value = '';
+            document.getElementById('hw-link-input').value = '';
             if (preselectSubject) {
                 subjectSelect.value = preselectSubject;
             }
+
+            // ล้างรายการแนบชั่วคราว
+            tempLinks = [];
+            tempImages = [];
+            tempFiles = [];
+            renderTempAttachments();
 
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -873,11 +1298,137 @@
             modal.classList.remove('flex');
         }
 
-        function saveHomework(event) {
+        // เพิ่มลิงก์ชั่วคราว
+        function addTempLink() {
+            const input = document.getElementById('hw-link-input');
+            let url = input.value.trim();
+            if (!url) return;
+            if (!/^https?:\/\//i.test(url)) {
+                url = 'https://' + url;
+            }
+            tempLinks.push(url);
+            input.value = '';
+            renderTempAttachments();
+        }
+
+        function removeTempLink(index) {
+            tempLinks.splice(index, 1);
+            renderTempAttachments();
+        }
+
+        // อัปโหลดและย่อขนาดรูปภาพอัตโนมัติด้วย Canvas
+        function handleImageUpload(event) {
+            const files = Array.from(event.target.files);
+            if (!files.length) return;
+
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_DIM = 1200;
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > MAX_DIM || h > MAX_DIM) {
+                            if (w > h) {
+                                h = Math.round((h * MAX_DIM) / w);
+                                w = MAX_DIM;
+                            } else {
+                                w = Math.round((w * MAX_DIM) / h);
+                                h = MAX_DIM;
+                            }
+                        }
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+
+                        tempImages.push({
+                            name: file.name,
+                            dataUrl: compressedDataUrl
+                        });
+                        renderTempAttachments();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+            event.target.value = '';
+        }
+
+        function removeTempImage(index) {
+            tempImages.splice(index, 1);
+            renderTempAttachments();
+        }
+
+        // อัปโหลดไฟล์เอกสาร (เก็บ Blob ลง IndexedDB)
+        function handleFileUpload(event) {
+            const files = Array.from(event.target.files);
+            if (!files.length) return;
+
+            files.forEach(file => {
+                tempFiles.push({
+                    name: file.name,
+                    type: file.type || 'application/octet-stream',
+                    size: file.size,
+                    blob: file
+                });
+            });
+            renderTempAttachments();
+            event.target.value = '';
+        }
+
+        function removeTempFile(index) {
+            tempFiles.splice(index, 1);
+            renderTempAttachments();
+        }
+
+        function renderTempAttachments() {
+            // 1. แสดงลิงก์
+            const linksEl = document.getElementById('temp-links-list');
+            linksEl.innerHTML = tempLinks.map((link, idx) => `
+                <div class="flex items-center justify-between gap-2 bg-white px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs">
+                    <span class="truncate text-indigo-600 font-medium">${escapeHTML(link)}</span>
+                    <button type="button" onclick="removeTempLink(${idx})" class="text-rose-500 hover:text-rose-700 font-bold px-1">×</button>
+                </div>
+            `).join('');
+
+            // 2. แสดงรูปภาพ
+            const imgsEl = document.getElementById('temp-images-preview');
+            imgsEl.innerHTML = tempImages.map((img, idx) => `
+                <div class="relative rounded-xl overflow-hidden border border-slate-200 aspect-square bg-slate-100">
+                    <img src="${img.dataUrl}" class="w-full h-full object-cover">
+                    <button type="button" onclick="removeTempImage(${idx})" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-rose-600 text-white text-xs font-bold flex items-center justify-center shadow">×</button>
+                </div>
+            `).join('');
+
+            // 3. แสดงไฟล์เอกสาร
+            const filesEl = document.getElementById('temp-files-preview');
+            filesEl.innerHTML = tempFiles.map((f, idx) => `
+                <div class="flex items-center justify-between gap-2 bg-amber-50/70 px-3 py-2 rounded-xl border border-amber-200 text-xs">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <i class="ph-fill ph-file text-amber-600 text-base flex-shrink-0"></i>
+                        <span class="truncate font-semibold text-slate-700">${escapeHTML(f.name)}</span>
+                        <span class="text-[10px] text-slate-500 flex-shrink-0">(${formatBytes(f.size)})</span>
+                    </div>
+                    <button type="button" onclick="removeTempFile(${idx})" class="text-rose-500 hover:text-rose-700 font-bold px-1">×</button>
+                </div>
+            `).join('');
+        }
+
+        async function saveHomework(event) {
             event.preventDefault();
             const subjectCode = document.getElementById('hw-subject').value;
             const title = document.getElementById('hw-title').value.trim();
             const date = document.getElementById('hw-date').value;
+
+            // เผื่อผู้ใช้พิมพ์ลิงก์ค้างไว้ในช่องแต่ลืมกดปุ่ม + เพิ่มลิงก์
+            const pendingLink = document.getElementById('hw-link-input').value.trim();
+            if (pendingLink) {
+                tempLinks.push(/^https?:\/\//i.test(pendingLink) ? pendingLink : 'https://' + pendingLink);
+            }
 
             if (!title || !date) return;
 
@@ -886,30 +1437,38 @@
                 subjectCode,
                 title,
                 date,
-                completed: false
+                completed: false,
+                links: [...tempLinks],
+                images: [...tempImages],
+                files: [...tempFiles]
             };
 
-            homeworks.push(newHw);
-            saveToStorage();
+            try {
+                await dbPutHomework(newHw);
+                homeworks.push(newHw);
 
-            // ย้ายปฏิทินไปยังวันที่บันทึก
-            const [y, m] = date.split('-').map(Number);
-            currentYear = y;
-            currentMonth = m - 1;
-            selectedDateStr = date;
+                const [y, m] = date.split('-').map(Number);
+                currentYear = y;
+                currentMonth = m - 1;
+                selectedDateStr = date;
 
-            closeAddModal();
-            renderCalendar();
-            renderSelectedDayTasks();
-            renderUpcomingTasks();
-            showToast('บันทึกการบ้านลงปฏิทินแล้ว!');
+                closeAddModal();
+                switchTab('calendar'); // พาไปดูปฏิทินที่เพิ่งบันทึกทันที
+                renderCalendar();
+                renderSelectedDayTasks();
+                renderUpcomingTasks();
+                showToast('บันทึกการบ้านและไฟล์แนบเรียบร้อย!');
+            } catch (err) {
+                console.error(err);
+                showToast('เกิดข้อผิดพลาดในการบันทึกไฟล์', 'error');
+            }
         }
 
-        function toggleComplete(id) {
+        async function toggleComplete(id) {
             const idx = homeworks.findIndex(h => h.id === id);
             if (idx !== -1) {
                 homeworks[idx].completed = !homeworks[idx].completed;
-                saveToStorage();
+                await dbPutHomework(homeworks[idx]);
                 renderCalendar();
                 renderSelectedDayTasks();
                 renderUpcomingTasks();
@@ -917,9 +1476,9 @@
             }
         }
 
-        function deleteHomework(id) {
+        async function deleteHomework(id) {
+            await dbDeleteHomework(id);
             homeworks = homeworks.filter(h => h.id !== id);
-            saveToStorage();
             renderCalendar();
             renderSelectedDayTasks();
             renderUpcomingTasks();
@@ -927,115 +1486,140 @@
         }
 
         // =========================================================================
-        // 9. ระบบตารางเรียน (CLASS SCHEDULE VIEW)
+        // 10. หน้าต่างดูรายละเอียดการบ้าน (HOMEWORK DETAIL VIEWER MODAL)
         // =========================================================================
-        function filterSchedule(day) {
-            currentScheduleFilter = day;
-            
-            // อัปเดตสไตล์ปุ่มตัวกรอง
-            document.querySelectorAll('.day-filter-btn').forEach(btn => {
-                if (btn.dataset.day === day) {
-                    btn.className = 'day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-indigo-600 text-white shadow-sm whitespace-nowrap transition';
-                } else {
-                    btn.className = 'day-filter-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition';
-                }
-            });
+        function openDetailModal(id) {
+            const task = homeworks.find(h => h.id === id);
+            if (!task) return;
 
-            renderSchedule();
-        }
+            const subj = getSubjectByCode(task.subjectCode);
+            const modal = document.getElementById('detail-modal');
 
-        function renderSchedule() {
-            const container = document.getElementById('schedule-container');
-            const daysOrder = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์'];
-            const todayDayName = THAI_DAYS_FULL[TODAY_OBJ.getDay()];
+            // ปรับสีหัว Modal ตามวิชา
+            const headerBar = document.getElementById('detail-header-bar');
+            headerBar.className = `px-6 py-4 flex items-center justify-between ${subj.badge}`;
 
-            document.getElementById('current-day-indicator').textContent = `วันนี้: วัน${todayDayName}`;
+            document.getElementById('detail-subject-code').textContent = `${subj.code} (กลุ่ม ${subj.group})`;
+            document.getElementById('detail-due-date').textContent = `กำหนดส่ง: ${formatThaiDateFull(task.date)}`;
+            document.getElementById('detail-subject-name').textContent = subj.name;
+            document.getElementById('detail-title').textContent = task.title;
 
-            const daysToRender = currentScheduleFilter === 'ALL' ? daysOrder : [currentScheduleFilter];
+            // 1. แสดงลิงก์
+            const linksSec = document.getElementById('detail-links-section');
+            const linksList = document.getElementById('detail-links-list');
+            if (task.links && task.links.length > 0) {
+                linksSec.classList.remove('hidden');
+                linksList.innerHTML = task.links.map(url => `
+                    <a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between gap-2 p-3 rounded-2xl bg-indigo-50/70 hover:bg-indigo-100 border border-indigo-200/80 text-indigo-700 transition group">
+                        <span class="text-xs sm:text-sm font-medium truncate">${escapeHTML(url)}</span>
+                        <span class="text-xs font-bold whitespace-nowrap flex items-center gap-1">เปิดลิงก์ <i class="ph-bold ph-arrow-square-out"></i></span>
+                    </a>
+                `).join('');
+            } else {
+                linksSec.classList.add('hidden');
+            }
 
-            container.innerHTML = daysToRender.map(dayName => {
-                const classes = CLASS_SCHEDULE.filter(c => c.day === dayName);
-                const isToday = dayName === todayDayName;
+            // 2. แสดงรูปภาพ
+            const imgsSec = document.getElementById('detail-images-section');
+            const imgsGrid = document.getElementById('detail-images-grid');
+            if (task.images && task.images.length > 0) {
+                imgsSec.classList.remove('hidden');
+                imgsGrid.innerHTML = task.images.map(img => `
+                    <div onclick="openLightbox('${img.dataUrl}')" class="relative rounded-2xl overflow-hidden border border-slate-200 aspect-video bg-slate-100 cursor-zoom-in group">
+                        <img src="${img.dataUrl}" alt="${escapeHTML(img.name)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition flex items-center justify-center">
+                            <i class="ph-bold ph-magnifying-glass-plus text-white text-2xl opacity-0 group-hover:opacity-100 transition"></i>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                imgsSec.classList.add('hidden');
+            }
 
-                return `
-                    <div class="bg-white rounded-3xl shadow-sm border ${isToday ? 'border-indigo-300 ring-2 ring-indigo-100' : 'border-slate-200/70'} overflow-hidden">
-                        <!-- หัวข้อวัน -->
-                        <div class="px-5 py-3.5 ${isToday ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-800 border-b border-slate-200/70'} flex items-center justify-between">
-                            <div class="flex items-center gap-2.5">
-                                <span class="font-bold text-base sm:text-lg">วัน${dayName}</span>
-                                ${isToday ? '<span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-white text-indigo-600">วันนี้</span>' : ''}
+            // 3. แสดงไฟล์เอกสาร (สร้าง Object URL ให้เปิดดู/ดาวน์โหลดได้จริง)
+            const filesSec = document.getElementById('detail-files-section');
+            const filesList = document.getElementById('detail-files-list');
+            if (task.files && task.files.length > 0) {
+                filesSec.classList.remove('hidden');
+                filesList.innerHTML = '';
+                task.files.forEach(f => {
+                    const blobUrl = URL.createObjectURL(f.blob);
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center justify-between gap-3 p-3 rounded-2xl bg-amber-50/70 border border-amber-200/80';
+                    row.innerHTML = `
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+                                <i class="ph-fill ph-file-text text-xl"></i>
                             </div>
-                            <span class="text-xs font-medium ${isToday ? 'text-indigo-100' : 'text-slate-500'}">
-                                ${classes.length} คาบเรียน
-                            </span>
+                            <div class="min-w-0">
+                                <p class="text-xs sm:text-sm font-bold text-slate-800 truncate">${escapeHTML(f.name)}</p>
+                                <p class="text-[11px] text-slate-500">${formatBytes(f.size)}</p>
+                            </div>
                         </div>
-
-                        <!-- รายการคาบเรียนในวันนั้น -->
-                        <div class="divide-y divide-slate-100">
-                            ${classes.map(cls => {
-                                const subj = getSubjectByCode(cls.code);
-                                return `
-                                    <div class="p-4 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/80 transition">
-                                        <div class="flex items-start sm:items-center gap-3.5">
-                                            <!-- แถบสีประจำวิชา -->
-                                            <div class="w-1.5 h-12 rounded-full ${subj.dot} flex-shrink-0 mt-1 sm:mt-0"></div>
-                                            
-                                            <div>
-                                                <div class="flex flex-wrap items-center gap-2 mb-1">
-                                                    <span class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-700">
-                                                        <i class="ph-bold ph-clock text-indigo-500"></i> ${cls.time}
-                                                    </span>
-                                                    <span class="text-xs font-bold px-2.5 py-0.5 rounded-lg ${subj.bg} ${subj.text}">
-                                                        ${cls.code}
-                                                    </span>
-                                                    <span class="text-xs font-medium text-slate-500">
-                                                        กลุ่ม ${cls.group}
-                                                    </span>
-                                                </div>
-                                                <h4 class="font-bold text-slate-800 text-sm sm:text-base">${subj.name}</h4>
-                                            </div>
-                                        </div>
-
-                                        <!-- ห้องเรียน + ปุ่มจดการบ้านวิชานี้ -->
-                                        <div class="flex items-center justify-between sm:justify-end gap-3 pl-5 sm:pl-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-                                            <div class="flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl">
-                                                <i class="ph-fill ph-map-pin text-rose-500"></i>
-                                                <span>ห้อง ${cls.room}</span>
-                                            </div>
-                                            <button onclick="quickAddFromSchedule('${cls.code}')" class="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white transition">
-                                                <i class="ph-bold ph-plus"></i> จดการบ้าน
-                                            </button>
-                                        </div>
-                                    </div>
-                                `;
-                            }).join('')}
+                        <div class="flex items-center gap-1.5 flex-shrink-0">
+                            <a href="${blobUrl}" target="_blank" class="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 transition">เปิดดู</a>
+                            <a href="${blobUrl}" download="${escapeHTML(f.name)}" class="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition">โหลด</a>
                         </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                    filesList.appendChild(row);
+                });
+            } else {
+                filesSec.classList.add('hidden');
+            }
+
+            // ตั้งค่าปุ่มลบและปุ่มติ๊กเสร็จในหน้าต่างรายละเอียด
+            document.getElementById('detail-delete-btn').onclick = async () => {
+                closeDetailModal();
+                await deleteHomework(task.id);
+            };
+
+            const toggleBtn = document.getElementById('detail-toggle-btn');
+            if (task.completed) {
+                toggleBtn.className = 'flex-1 py-2.5 px-4 rounded-2xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5';
+                toggleBtn.innerHTML = '<i class="ph-bold ph-arrow-counter-clockwise"></i> เปลี่ยนเป็นยังไม่เสร็จ';
+            } else {
+                toggleBtn.className = 'flex-1 py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold shadow-md transition flex items-center justify-center gap-1.5';
+                toggleBtn.innerHTML = '<i class="ph-bold ph-check-circle"></i> ทำเสร็จแล้ว';
+            }
+            toggleBtn.onclick = async () => {
+                closeDetailModal();
+                await toggleComplete(task.id);
+            };
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
-        function quickAddFromSchedule(subjectCode) {
-            switchTab('calendar');
-            openAddModal(selectedDateStr, subjectCode);
+        function closeDetailModal() {
+            const modal = document.getElementById('detail-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
         }
 
-        function renderSubjectsLegend() {
-            const container = document.getElementById('subjects-legend');
-            container.innerHTML = SUBJECTS.map(s => `
-                <div class="flex items-center gap-2.5 p-2.5 rounded-2xl border ${s.border} ${s.bg}/40">
-                    <span class="w-3 h-3 rounded-full ${s.dot} flex-shrink-0"></span>
-                    <div class="min-w-0">
-                        <p class="text-xs font-bold ${s.text}">${s.code} (กลุ่ม ${s.group})</p>
-                        <p class="text-xs text-slate-700 truncate">${s.name}</p>
-                    </div>
-                </div>
-            `).join('');
+        function openLightbox(src) {
+            document.getElementById('lightbox-img').src = src;
+            const lb = document.getElementById('image-lightbox');
+            lb.classList.remove('hidden');
+            lb.classList.add('flex');
+        }
+
+        function closeLightbox() {
+            const lb = document.getElementById('image-lightbox');
+            lb.classList.add('hidden');
+            lb.classList.remove('flex');
         }
 
         // =========================================================================
-        // 10. ยูทิลิตี้เสริม (TOAST & SECURITY)
+        // 11. ยูทิลิตี้เสริม (TOAST, FORMAT BYTES, ESCAPE HTML)
         // =========================================================================
+        function formatBytes(bytes) {
+            if (!bytes || bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const msgEl = document.getElementById('toast-message');
@@ -1061,7 +1645,7 @@
         }
 
         function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, tag => ({
+            return String(str).replace(/[&<>'"]/g, tag => ({
                 '&': '&amp;',
                 '<': '&lt;',
                 '>': '&gt;',
