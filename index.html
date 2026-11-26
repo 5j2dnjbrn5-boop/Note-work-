@@ -262,43 +262,40 @@
                             <span class="text-xs font-medium text-indigo-600 uppercase tracking-wider">รายการงานประจำวัน (คลิกที่งานเพื่อดูรายละเอียด)</span>
                             <h3 id="selected-date-heading" class="text-lg font-bold text-slate-800">วันพฤหัสบดีที่ 26 พฤศจิกายน 2569</h3>
                         </div>
-                        <button onclick="openAddModal(selectedDateStr)" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs sm:text-sm font-semibold transition">
+                        <button onclick="openAddModal(selectedDateStr)" class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition flex items-center gap-1">
                             <i class="ph-bold ph-plus"></i> เพิ่มงานวันนี้
                         </button>
                     </div>
-
-                    <div id="selected-day-tasks" class="space-y-2.5">
-                        <!-- แสดงรายการการบ้านของวันที่เลือก -->
+                    <div id="selected-day-tasks" class="space-y-3">
+                        <!-- เติมรายการงานของวันที่เลือก -->
                     </div>
                 </div>
 
-                <!-- กล่องสรุปงานค้างส่งทั้งหมด -->
+                <!-- กล่องสรุปงานที่ค้างส่งทั้งหมด -->
                 <div class="lg:col-span-5 bg-white rounded-3xl p-5 shadow-sm border border-slate-200/70">
                     <div class="flex items-center justify-between mb-4">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
-                                <i class="ph-fill ph-warning-circle text-lg"></i>
-                            </div>
-                            <h3 class="text-base font-bold text-slate-800">งานค้างส่งทั้งหมด</h3>
+                        <div>
+                            <span class="text-xs font-medium text-rose-500 uppercase tracking-wider">เตือนความจำ</span>
+                            <h3 class="text-lg font-bold text-slate-800">งานที่ยังไม่เสร็จ</h3>
                         </div>
+                        <i class="ph-duotone ph-bell-ringing text-2xl text-amber-500"></i>
                     </div>
                     <div id="upcoming-tasks-list" class="space-y-2.5 max-h-[340px] overflow-y-auto pr-1">
-                        <!-- แสดงงานที่ยังไม่เสร็จเรียงตามวันส่ง -->
+                        <!-- เติมงานที่ยังไม่เสร็จ -->
                     </div>
                 </div>
             </div>
         </section>
-
     </main>
 
-    <!-- ==================== MODAL 1: ฟอร์มเพิ่มการบ้าน (พร้อมแนบ ลิงก์ / รูป / ไฟล์) ==================== -->
+    <!-- ==================== MODAL 1: ฟอร์มเพิ่ม / แก้ไขการบ้าน (ย่อส่วนแนบไฟล์ได้) ==================== -->
     <div id="homework-modal" class="fixed inset-0 z-40 hidden items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity overflow-y-auto">
-        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden my-auto">
+        <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-slate-100 overflow-hidden my-auto">
             <!-- หัว Modal -->
-            <div class="px-6 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white flex items-center justify-between">
+            <div class="px-5 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <i class="ph-fill ph-pencil-simple-line text-xl"></i>
-                    <h3 class="font-bold text-lg">จดการบ้าน & แนบรายละเอียด</h3>
+                    <i id="modal-header-icon" class="ph-fill ph-pencil-simple-line text-xl"></i>
+                    <h3 id="modal-header-title" class="font-bold text-base sm:text-lg">จดการบ้านใหม่</h3>
                 </div>
                 <button onclick="closeAddModal()" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center transition">
                     <i class="ph-bold ph-x"></i>
@@ -306,111 +303,145 @@
             </div>
 
             <!-- ฟอร์มกรอกข้อมูล -->
-            <form id="homework-form" onsubmit="saveHomework(event)" class="p-5 sm:p-6 space-y-4 max-h-[82vh] overflow-y-auto">
-                
+            <form id="homework-form" onsubmit="saveHomework(event)" class="p-5 space-y-4 max-h-[84vh] overflow-y-auto">
+                <input type="hidden" id="hw-edit-id" value="">
+
                 <!-- 1. เลือกวิชา (ไม่ต้องพิมพ์เอง) -->
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">1. เลือกวิชาเรียน <span class="text-rose-500">*</span></label>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">1. เลือกวิชาเรียน <span class="text-rose-500">*</span></label>
                     <div class="relative">
-                        <select id="hw-subject" required class="w-full appearance-none rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 pr-10 text-sm font-medium text-slate-800 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 transition">
+                        <select id="hw-subject" required class="w-full appearance-none rounded-2xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 pr-9 text-sm font-semibold text-slate-800 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 transition">
                             <!-- ตัวเลือกวิชาทั้ง 9 วิชาจะถูกสร้างอัตโนมัติ -->
                         </select>
                         <i class="ph-bold ph-caret-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
                     </div>
-                    <!-- ปุ่มกดเลือกวิชาด่วน (Quick Chips) -->
-                    <div id="quick-subject-chips" class="flex flex-wrap gap-1.5 mt-2">
+                    <!-- ปุ่มกดเลือกวิชาด่วน (เลื่อนแนวนอนได้ ไม่รกบรรทัด) -->
+                    <div id="quick-subject-chips" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar mt-2 pb-0.5">
                         <!-- สร้างปุ่มกดเลือกวิชาด่วน -->
                     </div>
                 </div>
 
-                <!-- 2. รายละเอียดการบ้าน -->
+                <!-- 2. วันที่กำหนดส่ง -->
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">2. หัวข้อ / รายละเอียดงาน <span class="text-rose-500">*</span></label>
-                    <textarea id="hw-title" rows="2" required placeholder="เช่น ทำแบบฝึกหัดบทที่ 3 ข้อ 1-10, ส่งสไลด์กลุ่ม..." class="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 transition"></textarea>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">2. วันที่กำหนดส่ง <span class="text-rose-500">*</span></label>
+                    <input type="date" id="hw-date" required class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 transition">
+                </div>
+
+                <!-- 3. รายละเอียดการบ้าน -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">3. รายละเอียดงาน <span class="text-rose-500">*</span></label>
+                    <textarea id="hw-title" rows="2" required placeholder="เช่น ทำแบบฝึกหัดบทที่ 3 ข้อ 1-10..." class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm text-slate-800 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-100 transition"></textarea>
                     <!-- ตัวช่วยข้อความด่วน -->
                     <div class="flex flex-wrap gap-1.5 mt-1.5">
-                        <button type="button" onclick="appendQuickText('ทำแบบฝึกหัด ')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition">+ แบบฝึกหัด</button>
-                        <button type="button" onclick="appendQuickText('ทำรายงาน/สไลด์ ')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition">+ รายงาน/สไลด์</button>
-                        <button type="button" onclick="appendQuickText('สอบย่อย (Quiz) ')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition">+ สอบย่อย</button>
-                        <button type="button" onclick="appendQuickText('ส่งงานในระบบ ')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition">+ ส่งในระบบ</button>
+                        <button type="button" onclick="appendQuickText('ทำแบบฝึกหัด ')" class="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition">+ แบบฝึกหัด</button>
+                        <button type="button" onclick="appendQuickText('ทำรายงาน/สไลด์ ')" class="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition">+ รายงาน</button>
+                        <button type="button" onclick="appendQuickText('สอบย่อย (Quiz) ')" class="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition">+ สอบย่อย</button>
+                        <button type="button" onclick="appendQuickText('ส่งไฟล์ในระบบ ')" class="text-[11px] font-medium px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition">+ ส่งไฟล์</button>
                     </div>
                 </div>
 
-                <!-- 3. วันที่กำหนดส่ง -->
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">3. วันที่กำหนดส่ง <span class="text-rose-500">*</span></label>
-                    <input type="date" id="hw-date" required class="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-800 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 transition">
-                </div>
+                <!-- 4. ส่วนแนบเพิ่มเติมแบบย่อ-ขยายได้ (Collapsible Accordion) -->
+                <div class="rounded-2xl border border-slate-200/90 bg-slate-50/60 overflow-hidden">
+                    <button type="button" onclick="toggleAttachmentsPanel()" class="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-slate-100/80 transition">
+                        <div class="flex items-center gap-2">
+                            <i class="ph-bold ph-paperclip text-indigo-600 text-base"></i>
+                            <span class="text-xs sm:text-sm font-semibold text-slate-700">แนบเพิ่มเติม (ลิงก์ / รูปภาพ / ไฟล์)</span>
+                            <span id="attachment-count-badge" class="hidden text-[11px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">0</span>
+                        </div>
+                        <i id="attachment-chevron" class="ph-bold ph-caret-down text-slate-400 transition-transform duration-200"></i>
+                    </button>
 
-                <!-- 4. ส่วนแนบข้อมูลเพิ่มเติม (ลิงก์ / รูปภาพ / ไฟล์) -->
-                <div class="pt-2 border-t border-slate-100 space-y-3">
-                    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">แนบข้อมูลประกอบ (ไม่บังคับ)</p>
-
-                    <!-- 4.1 แนบลิงก์ URL -->
-                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/80">
-                        <label class="text-xs font-semibold text-slate-700 flex items-center gap-1.5 mb-1.5">
-                            <i class="ph-bold ph-link text-indigo-600"></i> แนบลิงก์ (Google Drive / Canva / เว็บส่งงาน)
-                        </label>
-                        <div class="flex gap-2">
-                            <input type="url" id="hw-link-input" placeholder="วางลิงก์ https://... ที่นี่" class="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs sm:text-sm focus:border-indigo-500 focus:outline-none">
-                            <button type="button" onclick="addTempLink()" class="px-3.5 py-2 rounded-xl bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs font-bold transition whitespace-nowrap">
-                                + เพิ่มลิงก์
+                    <!-- เนื้อหาที่ย่อ/ขยายได้ -->
+                    <div id="attachments-collapsible-body" class="hidden px-4 pb-4 pt-2 border-t border-slate-200/70 space-y-3 bg-white">
+                        <!-- แท็บย่อยสำหรับเลือกประเภทการแนบ -->
+                        <div class="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl">
+                            <button type="button" id="att-tab-link" onclick="switchAttachmentTab('link')" class="py-1.5 px-2 rounded-lg text-xs font-semibold bg-white text-indigo-600 shadow-sm transition flex items-center justify-center gap-1">
+                                <i class="ph-bold ph-link"></i> ลิงก์
+                            </button>
+                            <button type="button" id="att-tab-image" onclick="switchAttachmentTab('image')" class="py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1">
+                                <i class="ph-bold ph-image"></i> รูปภาพ
+                            </button>
+                            <button type="button" id="att-tab-file" onclick="switchAttachmentTab('file')" class="py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1">
+                                <i class="ph-bold ph-file-text"></i> ไฟล์
                             </button>
                         </div>
-                        <div id="temp-links-list" class="mt-2 space-y-1.5"></div>
+
+                        <!-- ช่องใส่ลิงก์ -->
+                        <div id="att-panel-link" class="flex gap-2">
+                            <input type="url" id="hw-link-input" placeholder="วางลิงก์ https://... ที่นี่" class="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs sm:text-sm focus:bg-white focus:border-indigo-500 focus:outline-none">
+                            <button type="button" onclick="addTempLink()" class="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition whitespace-nowrap">
+                                + เพิ่ม
+                            </button>
+                        </div>
+
+                        <!-- ช่องอัปโหลดรูปภาพ -->
+                        <div id="att-panel-image" class="hidden">
+                            <label class="flex items-center justify-center gap-2 p-3 rounded-xl border-2 border-dashed border-sky-300 bg-sky-50/50 hover:bg-sky-50 cursor-pointer transition">
+                                <i class="ph-duotone ph-image text-xl text-sky-600"></i>
+                                <span class="text-xs font-bold text-sky-800">เลือกรูปภาพโจทย์ / งาน (เลือกได้หลายรูป)</span>
+                                <input type="file" id="hw-image-input" accept="image/*" multiple onchange="handleImageUpload(event)" class="hidden">
+                            </label>
+                        </div>
+
+                        <!-- ช่องอัปโหลดไฟล์เอกสาร -->
+                        <div id="att-panel-file" class="hidden">
+                            <label class="flex items-center justify-center gap-2 p-3 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50/50 hover:bg-amber-50 cursor-pointer transition">
+                                <i class="ph-duotone ph-file-pdf text-xl text-amber-600"></i>
+                                <span class="text-xs font-bold text-amber-800">เลือกไฟล์เอกสาร PDF / Word / ZIP</span>
+                                <input type="file" id="hw-file-input" multiple onchange="handleFileUpload(event)" class="hidden">
+                            </label>
+                        </div>
+
+                        <!-- รายการสิ่งที่แนบไว้ทั้งหมด (แสดงรวมกันแบบกะทัดรัด) -->
+                        <div id="temp-links-list" class="space-y-1.5"></div>
+                        <div id="temp-images-preview" class="grid grid-cols-4 gap-2"></div>
+                        <div id="temp-files-preview" class="space-y-1.5"></div>
                     </div>
-
-                    <!-- 4.2 ปุ่มอัปโหลดรูปภาพ และ อัปโหลดไฟล์เอกสาร -->
-                    <div class="grid grid-cols-2 gap-2.5">
-                        <!-- ปุ่มเลือกรูปภาพ -->
-                        <label class="flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-dashed border-sky-300 bg-sky-50/50 hover:bg-sky-50 cursor-pointer transition text-center">
-                            <i class="ph-duotone ph-image text-2xl text-sky-600 mb-1"></i>
-                            <span class="text-xs font-bold text-sky-800">เพิ่มรูปภาพโจทย์</span>
-                            <span class="text-[10px] text-sky-600">JPG, PNG (เลือกได้หลายรูป)</span>
-                            <input type="file" id="hw-image-input" accept="image/*" multiple onchange="handleImageUpload(event)" class="hidden">
-                        </label>
-
-                        <!-- ปุ่มเลือกไฟล์เอกสาร -->
-                        <label class="flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/50 hover:bg-amber-50 cursor-pointer transition text-center">
-                            <i class="ph-duotone ph-file-pdf text-2xl text-amber-600 mb-1"></i>
-                            <span class="text-xs font-bold text-amber-800">เพิ่มไฟล์เอกสาร</span>
-                            <span class="text-[10px] text-amber-600">PDF, Word, ZIP ฯลฯ</span>
-                            <input type="file" id="hw-file-input" multiple onchange="handleFileUpload(event)" class="hidden">
-                        </label>
-                    </div>
-
-                    <!-- แสดงตัวอย่างรูปภาพที่เลือกไว้ -->
-                    <div id="temp-images-preview" class="grid grid-cols-3 gap-2"></div>
-
-                    <!-- แสดงรายการไฟล์เอกสารที่เลือกไว้ -->
-                    <div id="temp-files-preview" class="space-y-1.5"></div>
                 </div>
 
                 <!-- ปุ่มบันทึก -->
-                <div class="pt-2 flex items-center gap-3">
-                    <button type="button" onclick="closeAddModal()" class="flex-1 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition">
+                <div class="pt-1 flex items-center gap-2.5">
+                    <button type="button" onclick="closeAddModal()" class="flex-1 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold transition">
                         ยกเลิก
                     </button>
-                    <button type="submit" id="btn-save-hw" class="flex-1 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-lg shadow-indigo-200 transition flex items-center justify-center gap-1.5">
-                        <i class="ph-bold ph-check"></i> บันทึกการบ้าน
+                    <button type="submit" id="btn-save-hw" class="flex-1 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-md shadow-indigo-200 transition flex items-center justify-center gap-1.5">
+                        <i class="ph-bold ph-check"></i> <span id="btn-save-hw-text">บันทึกการบ้าน</span>
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- ==================== MODAL 2: หน้าต่างดูรายละเอียดการบ้าน (HOMEWORK DETAIL VIEWER) ==================== -->
+    <!-- ==================== MODAL 2: หน้าต่างดูรายละเอียดการบ้าน (ซ่อนปุ่มแก้ไข/ลบไว้ในเมนู ⋮) ==================== -->
     <div id="detail-modal" class="fixed inset-0 z-40 hidden items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity overflow-y-auto">
         <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl border border-slate-100 overflow-hidden my-auto">
             <!-- แถบสีด้านบนตามวิชา -->
-            <div id="detail-header-bar" class="px-6 py-4 bg-indigo-600 text-white flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <span id="detail-subject-code" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-white/20 backdrop-blur-sm">MAE67-112</span>
-                    <span id="detail-due-date" class="text-xs font-medium text-white/90">ส่ง 27 พ.ย. 2569</span>
+            <div id="detail-header-bar" class="px-5 py-4 bg-indigo-600 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2 min-w-0">
+                    <span id="detail-subject-code" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-white/20 backdrop-blur-sm whitespace-nowrap">MAE67-112</span>
+                    <span id="detail-due-date" class="text-xs font-medium text-white/90 truncate">ส่ง 27 พ.ย. 2569</span>
                 </div>
-                <button onclick="closeDetailModal()" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center transition">
-                    <i class="ph-bold ph-x"></i>
-                </button>
+
+                <!-- กลุ่มปุ่มด้านขวา: เมนูจุดสามจุด (ซ่อนแก้ไข/ลบ) + ปุ่มปิด -->
+                <div class="flex items-center gap-1.5 relative">
+                    <button id="detail-more-btn" onclick="toggleDetailMenu(event)" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center transition" title="ตัวเลือกเพิ่มเติม">
+                        <i class="ph-bold ph-dots-three-vertical text-lg"></i>
+                    </button>
+                    <!-- เมนู Dropdown ที่ซ่อนไว้ -->
+                    <div id="detail-dropdown-menu" class="hidden absolute right-9 top-9 w-40 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-50 text-slate-700 overflow-hidden">
+                        <button id="detail-edit-btn" class="w-full px-4 py-2.5 text-left text-xs sm:text-sm font-semibold hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2.5 transition">
+                            <i class="ph-bold ph-pencil-simple text-indigo-600 text-base"></i> แก้ไขข้อมูล
+                        </button>
+                        <div class="border-t border-slate-100 my-0.5"></div>
+                        <button id="detail-delete-btn" class="w-full px-4 py-2.5 text-left text-xs sm:text-sm font-semibold hover:bg-rose-50 text-rose-600 flex items-center gap-2.5 transition">
+                            <i class="ph-bold ph-trash text-base"></i> ลบงานนี้
+                        </button>
+                    </div>
+
+                    <button onclick="closeDetailModal()" class="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center transition" title="ปิดหน้าต่าง">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
@@ -446,13 +477,10 @@
                     <div id="detail-files-list" class="space-y-2"></div>
                 </div>
 
-                <!-- ปุ่มจัดการสถานะด้านล่าง -->
-                <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
-                    <button id="detail-delete-btn" class="px-4 py-2.5 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5">
-                        <i class="ph-bold ph-trash"></i> ลบงานนี้
-                    </button>
-                    <button id="detail-toggle-btn" class="flex-1 py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold shadow-md transition flex items-center justify-center gap-1.5">
-                        <i class="ph-bold ph-check-circle"></i> ทำเสร็จแล้ว
+                <!-- ปุ่มติ๊กสถานะเสร็จแล้วด้านล่าง (สะอาดตา ไม่มีปุ่มลบเกะกะ) -->
+                <div class="pt-3 border-t border-slate-100">
+                    <button id="detail-toggle-btn" class="w-full py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-md transition flex items-center justify-center gap-2">
+                        <i class="ph-bold ph-check-circle text-lg"></i> ทำเสร็จแล้ว
                     </button>
                 </div>
             </div>
@@ -676,11 +704,13 @@
         let currentScheduleMode = 'grid'; // 'grid' หรือ 'list'
         let currentScheduleFilter = 'ALL';
         let homeworks = [];
+        let editingHomeworkId = null; // เก็บ ID กรณีกำลังแก้ไขงานเดิม
 
-        // ตัวแปรชั่วคราวสำหรับฟอร์มเพิ่มการบ้าน
+        // ตัวแปรชั่วคราวสำหรับฟอร์มเพิ่ม/แก้ไขการบ้าน
         let tempLinks = [];
         let tempImages = []; // เก็บ { name, dataUrl }
         let tempFiles = [];  // เก็บ { name, type, size, blob }
+        let isAttachmentsExpanded = false;
 
         const THAI_MONTHS = [
             'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
@@ -1167,7 +1197,7 @@
             listEl.innerHTML = tasks.map(task => {
                 const subj = getSubjectByCode(task.subjectCode);
                 return `
-                    <div onclick="openDetailModal('${task.id}')" class="flex items-start justify-between gap-3 p-3.5 rounded-2xl border cursor-pointer transition ${task.completed ? 'bg-slate-50 border-slate-200/70 opacity-75' : 'bg-white border-slate-200 hover:border-indigo-300 shadow-sm'}">
+                    <div onclick="openDetailModal('${task.id}')" class="flex items-start justify-between gap-3 p-3.5 rounded-2xl border cursor-pointer transition relative group ${task.completed ? 'bg-slate-50 border-slate-200/70 opacity-75' : 'bg-white border-slate-200 hover:border-indigo-300 shadow-sm'}">
                         <div class="flex items-start gap-3 flex-1 min-w-0">
                             <button onclick="event.stopPropagation(); toggleComplete('${task.id}')" class="mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition flex-shrink-0 ${task.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 hover:border-indigo-500'}">
                                 ${task.completed ? '<i class="ph-bold ph-check text-xs"></i>' : ''}
@@ -1187,11 +1217,20 @@
                                 ${renderAttachmentBadges(task)}
                             </div>
                         </div>
-                        <div class="flex items-center gap-1 flex-shrink-0">
-                            <span class="text-xs text-indigo-600 font-medium px-2 py-1 rounded-lg bg-indigo-50 hidden sm:inline">ดูรายละเอียด</span>
-                            <button onclick="event.stopPropagation(); deleteHomework('${task.id}')" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition" title="ลบรายการนี้">
-                                <i class="ph-bold ph-trash text-base"></i>
+
+                        <!-- ซ่อนปุ่มแก้ไข/ลบ ไว้ในปุ่มเมนู ⋮ -->
+                        <div class="relative flex-shrink-0" onclick="event.stopPropagation()">
+                            <button onclick="toggleTaskItemMenu(event, 'menu-${task.id}')" class="w-8 h-8 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition" title="ตัวเลือก">
+                                <i class="ph-bold ph-dots-three-vertical text-lg"></i>
                             </button>
+                            <div id="menu-${task.id}" class="task-item-dropdown hidden absolute right-0 top-9 w-36 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-30 text-slate-700">
+                                <button onclick="closeAllTaskMenus(); openEditModal('${task.id}')" class="w-full px-3.5 py-2 text-left text-xs font-semibold hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2 transition">
+                                    <i class="ph-bold ph-pencil-simple text-indigo-600"></i> แก้ไข
+                                </button>
+                                <button onclick="closeAllTaskMenus(); deleteHomework('${task.id}')" class="w-full px-3.5 py-2 text-left text-xs font-semibold hover:bg-rose-50 text-rose-600 flex items-center gap-2 transition">
+                                    <i class="ph-bold ph-trash"></i> ลบงานนี้
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1241,7 +1280,7 @@
         }
 
         // =========================================================================
-        // 9. จัดการฟอร์มเพิ่มการบ้าน + แนบ ลิงก์ / รูปภาพ / ไฟล์เอกสาร
+        // 9. จัดการฟอร์มเพิ่ม / แก้ไขการบ้าน + ย่อ-ขยายส่วนแนบไฟล์
         // =========================================================================
         function populateSubjectSelect() {
             const selectEl = document.getElementById('hw-subject');
@@ -1252,7 +1291,7 @@
             `).join('');
 
             chipsEl.innerHTML = SUBJECTS.map(s => `
-                <button type="button" onclick="selectQuickSubject('${s.code}')" class="text-[11px] font-medium px-2.5 py-1 rounded-lg border transition ${s.bg} ${s.text} ${s.border} hover:opacity-80">
+                <button type="button" onclick="selectQuickSubject('${s.code}')" class="text-[11px] font-semibold px-2.5 py-1 rounded-lg border whitespace-nowrap transition ${s.bg} ${s.text} ${s.border} hover:opacity-80">
                     ${s.code}
                 </button>
             `).join('');
@@ -1268,7 +1307,44 @@
             input.focus();
         }
 
+        // เปิด-ปิดส่วนแนบเพิ่มเติม (Accordion)
+        function toggleAttachmentsPanel(forceState = null) {
+            isAttachmentsExpanded = forceState !== null ? forceState : !isAttachmentsExpanded;
+            const body = document.getElementById('attachments-collapsible-body');
+            const chevron = document.getElementById('attachment-chevron');
+
+            if (isAttachmentsExpanded) {
+                body.classList.remove('hidden');
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                body.classList.add('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // สลับแท็บย่อยในส่วนแนบเพิ่มเติม (ลิงก์ / รูปภาพ / ไฟล์)
+        function switchAttachmentTab(tab) {
+            const tabs = ['link', 'image', 'file'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`att-tab-${t}`);
+                const panel = document.getElementById(`att-panel-${t}`);
+                if (t === tab) {
+                    btn.className = 'py-1.5 px-2 rounded-lg text-xs font-semibold bg-white text-indigo-600 shadow-sm transition flex items-center justify-center gap-1';
+                    panel.classList.remove('hidden');
+                } else {
+                    btn.className = 'py-1.5 px-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1';
+                    panel.classList.add('hidden');
+                }
+            });
+        }
+
         function openAddModal(preselectDate = null, preselectSubject = null) {
+            editingHomeworkId = null;
+            document.getElementById('hw-edit-id').value = '';
+            document.getElementById('modal-header-title').textContent = 'จดการบ้านใหม่';
+            document.getElementById('modal-header-icon').className = 'ph-fill ph-pencil-simple-line text-xl';
+            document.getElementById('btn-save-hw-text').textContent = 'บันทึกการบ้าน';
+
             const modal = document.getElementById('homework-modal');
             const dateInput = document.getElementById('hw-date');
             const titleInput = document.getElementById('hw-title');
@@ -1281,18 +1357,53 @@
                 subjectSelect.value = preselectSubject;
             }
 
-            // ล้างรายการแนบชั่วคราว
+            // ล้างรายการแนบชั่วคราว และย่อส่วนแนบไว้เริ่มต้น
             tempLinks = [];
             tempImages = [];
             tempFiles = [];
             renderTempAttachments();
+            switchAttachmentTab('link');
+            toggleAttachmentsPanel(false);
 
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             setTimeout(() => titleInput.focus(), 100);
         }
 
+        // เปิดหน้าต่างแก้ไขข้อมูลการบ้านเดิม
+        function openEditModal(id) {
+            const task = homeworks.find(h => h.id === id);
+            if (!task) return;
+
+            editingHomeworkId = id;
+            document.getElementById('hw-edit-id').value = id;
+            document.getElementById('modal-header-title').textContent = 'แก้ไขข้อมูลการบ้าน';
+            document.getElementById('modal-header-icon').className = 'ph-fill ph-pencil-simple text-xl';
+            document.getElementById('btn-save-hw-text').textContent = 'บันทึกการแก้ไข';
+
+            document.getElementById('hw-subject').value = task.subjectCode;
+            document.getElementById('hw-date').value = task.date;
+            document.getElementById('hw-title').value = task.title;
+            document.getElementById('hw-link-input').value = '';
+
+            // คัดลอกไฟล์แนบเดิมมาใส่ในตัวแปรชั่วคราวเพื่อแก้ไขได้
+            tempLinks = task.links ? [...task.links] : [];
+            tempImages = task.images ? task.images.map(img => ({ ...img })) : [];
+            tempFiles = task.files ? task.files.map(f => ({ ...f })) : [];
+            renderTempAttachments();
+            switchAttachmentTab('link');
+
+            // ถ้ามีไฟล์แนบอยู่แล้วให้กางออกอัตโนมัติ ถ้าไม่มีให้ย่อไว้
+            const hasAnyAttachments = (tempLinks.length + tempImages.length + tempFiles.length) > 0;
+            toggleAttachmentsPanel(hasAnyAttachments);
+
+            const modal = document.getElementById('homework-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
         function closeAddModal() {
+            editingHomeworkId = null;
             const modal = document.getElementById('homework-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
@@ -1386,11 +1497,23 @@
         }
 
         function renderTempAttachments() {
+            // อัปเดตตัวเลขจำนวนไฟล์แนบตรงปุ่มย่อ-ขยาย
+            const totalCount = tempLinks.length + tempImages.length + tempFiles.length;
+            const countBadge = document.getElementById('attachment-count-badge');
+            if (totalCount > 0) {
+                countBadge.textContent = totalCount;
+                countBadge.classList.remove('hidden');
+            } else {
+                countBadge.classList.add('hidden');
+            }
+
             // 1. แสดงลิงก์
             const linksEl = document.getElementById('temp-links-list');
             linksEl.innerHTML = tempLinks.map((link, idx) => `
-                <div class="flex items-center justify-between gap-2 bg-white px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs">
-                    <span class="truncate text-indigo-600 font-medium">${escapeHTML(link)}</span>
+                <div class="flex items-center justify-between gap-2 bg-indigo-50/60 px-2.5 py-1.5 rounded-xl border border-indigo-100 text-xs">
+                    <span class="truncate text-indigo-700 font-medium flex items-center gap-1.5">
+                        <i class="ph-bold ph-link"></i> ${escapeHTML(link)}
+                    </span>
                     <button type="button" onclick="removeTempLink(${idx})" class="text-rose-500 hover:text-rose-700 font-bold px-1">×</button>
                 </div>
             `).join('');
@@ -1400,16 +1523,16 @@
             imgsEl.innerHTML = tempImages.map((img, idx) => `
                 <div class="relative rounded-xl overflow-hidden border border-slate-200 aspect-square bg-slate-100">
                     <img src="${img.dataUrl}" class="w-full h-full object-cover">
-                    <button type="button" onclick="removeTempImage(${idx})" class="absolute top-1 right-1 w-6 h-6 rounded-full bg-rose-600 text-white text-xs font-bold flex items-center justify-center shadow">×</button>
+                    <button type="button" onclick="removeTempImage(${idx})" class="absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-600 text-white text-xs font-bold flex items-center justify-center shadow">×</button>
                 </div>
             `).join('');
 
             // 3. แสดงไฟล์เอกสาร
             const filesEl = document.getElementById('temp-files-preview');
             filesEl.innerHTML = tempFiles.map((f, idx) => `
-                <div class="flex items-center justify-between gap-2 bg-amber-50/70 px-3 py-2 rounded-xl border border-amber-200 text-xs">
+                <div class="flex items-center justify-between gap-2 bg-amber-50/70 px-2.5 py-1.5 rounded-xl border border-amber-200 text-xs">
                     <div class="flex items-center gap-2 min-w-0">
-                        <i class="ph-fill ph-file text-amber-600 text-base flex-shrink-0"></i>
+                        <i class="ph-fill ph-file text-amber-600 text-sm flex-shrink-0"></i>
                         <span class="truncate font-semibold text-slate-700">${escapeHTML(f.name)}</span>
                         <span class="text-[10px] text-slate-500 flex-shrink-0">(${formatBytes(f.size)})</span>
                     </div>
@@ -1424,7 +1547,7 @@
             const title = document.getElementById('hw-title').value.trim();
             const date = document.getElementById('hw-date').value;
 
-            // เผื่อผู้ใช้พิมพ์ลิงก์ค้างไว้ในช่องแต่ลืมกดปุ่ม + เพิ่มลิงก์
+            // เผื่อผู้ใช้พิมพ์ลิงก์ค้างไว้ในช่องแต่ลืมกดปุ่ม + เพิ่ม
             const pendingLink = document.getElementById('hw-link-input').value.trim();
             if (pendingLink) {
                 tempLinks.push(/^https?:\/\//i.test(pendingLink) ? pendingLink : 'https://' + pendingLink);
@@ -1432,20 +1555,28 @@
 
             if (!title || !date) return;
 
-            const newHw = {
-                id: 'hw-' + Date.now(),
+            const isEditing = Boolean(editingHomeworkId);
+            const existingTask = isEditing ? homeworks.find(h => h.id === editingHomeworkId) : null;
+
+            const hwRecord = {
+                id: isEditing ? editingHomeworkId : 'hw-' + Date.now(),
                 subjectCode,
                 title,
                 date,
-                completed: false,
+                completed: existingTask ? existingTask.completed : false,
                 links: [...tempLinks],
                 images: [...tempImages],
                 files: [...tempFiles]
             };
 
             try {
-                await dbPutHomework(newHw);
-                homeworks.push(newHw);
+                await dbPutHomework(hwRecord);
+                if (isEditing) {
+                    const idx = homeworks.findIndex(h => h.id === editingHomeworkId);
+                    if (idx !== -1) homeworks[idx] = hwRecord;
+                } else {
+                    homeworks.push(hwRecord);
+                }
 
                 const [y, m] = date.split('-').map(Number);
                 currentYear = y;
@@ -1453,14 +1584,14 @@
                 selectedDateStr = date;
 
                 closeAddModal();
-                switchTab('calendar'); // พาไปดูปฏิทินที่เพิ่งบันทึกทันที
+                switchTab('calendar');
                 renderCalendar();
                 renderSelectedDayTasks();
                 renderUpcomingTasks();
-                showToast('บันทึกการบ้านและไฟล์แนบเรียบร้อย!');
+                showToast(isEditing ? 'บันทึกการแก้ไขเรียบร้อย!' : 'บันทึกการบ้านเรียบร้อย!');
             } catch (err) {
                 console.error(err);
-                showToast('เกิดข้อผิดพลาดในการบันทึกไฟล์', 'error');
+                showToast('เกิดข้อผิดพลาดในการบันทึกข้อมูล', 'error');
             }
         }
 
@@ -1486,21 +1617,49 @@
         }
 
         // =========================================================================
-        // 10. หน้าต่างดูรายละเอียดการบ้าน (HOMEWORK DETAIL VIEWER MODAL)
+        // 10. หน้าต่างดูรายละเอียดการบ้าน & จัดการเมนูที่ซ่อนไว้ (⋮)
         // =========================================================================
+        function toggleDetailMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('detail-dropdown-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function toggleTaskItemMenu(event, menuId) {
+            event.stopPropagation();
+            const targetMenu = document.getElementById(menuId);
+            const isHidden = targetMenu.classList.contains('hidden');
+            closeAllTaskMenus();
+            if (isHidden) {
+                targetMenu.classList.remove('hidden');
+            }
+        }
+
+        function closeAllTaskMenus() {
+            document.querySelectorAll('.task-item-dropdown').forEach(el => el.classList.add('hidden'));
+            const detailMenu = document.getElementById('detail-dropdown-menu');
+            if (detailMenu) detailMenu.classList.add('hidden');
+        }
+
+        // คลิกพื้นที่ว่างใดๆ ให้ปิดเมนูจุดสามจุดที่เปิดค้างอยู่
+        document.addEventListener('click', () => {
+            closeAllTaskMenus();
+        });
+
         function openDetailModal(id) {
             const task = homeworks.find(h => h.id === id);
             if (!task) return;
 
+            closeAllTaskMenus();
             const subj = getSubjectByCode(task.subjectCode);
             const modal = document.getElementById('detail-modal');
 
             // ปรับสีหัว Modal ตามวิชา
             const headerBar = document.getElementById('detail-header-bar');
-            headerBar.className = `px-6 py-4 flex items-center justify-between ${subj.badge}`;
+            headerBar.className = `px-5 py-4 flex items-center justify-between ${subj.badge}`;
 
             document.getElementById('detail-subject-code').textContent = `${subj.code} (กลุ่ม ${subj.group})`;
-            document.getElementById('detail-due-date').textContent = `กำหนดส่ง: ${formatThaiDateFull(task.date)}`;
+            document.getElementById('detail-due-date').textContent = `ส่ง: ${formatThaiDateFull(task.date)}`;
             document.getElementById('detail-subject-name').textContent = subj.name;
             document.getElementById('detail-title').textContent = task.title;
 
@@ -1567,7 +1726,12 @@
                 filesSec.classList.add('hidden');
             }
 
-            // ตั้งค่าปุ่มลบและปุ่มติ๊กเสร็จในหน้าต่างรายละเอียด
+            // ตั้งค่าปุ่มแก้ไข / ลบ (ในเมนู ⋮) และปุ่มติ๊กเสร็จในหน้าต่างรายละเอียด
+            document.getElementById('detail-edit-btn').onclick = () => {
+                closeDetailModal();
+                openEditModal(task.id);
+            };
+
             document.getElementById('detail-delete-btn').onclick = async () => {
                 closeDetailModal();
                 await deleteHomework(task.id);
@@ -1575,11 +1739,11 @@
 
             const toggleBtn = document.getElementById('detail-toggle-btn');
             if (task.completed) {
-                toggleBtn.className = 'flex-1 py-2.5 px-4 rounded-2xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs sm:text-sm font-semibold transition flex items-center justify-center gap-1.5';
-                toggleBtn.innerHTML = '<i class="ph-bold ph-arrow-counter-clockwise"></i> เปลี่ยนเป็นยังไม่เสร็จ';
+                toggleBtn.className = 'w-full py-3 px-4 rounded-2xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold transition flex items-center justify-center gap-2';
+                toggleBtn.innerHTML = '<i class="ph-bold ph-arrow-counter-clockwise text-lg"></i> เปลี่ยนเป็นยังไม่เสร็จ';
             } else {
-                toggleBtn.className = 'flex-1 py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold shadow-md transition flex items-center justify-center gap-1.5';
-                toggleBtn.innerHTML = '<i class="ph-bold ph-check-circle"></i> ทำเสร็จแล้ว';
+                toggleBtn.className = 'w-full py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-md transition flex items-center justify-center gap-2';
+                toggleBtn.innerHTML = '<i class="ph-bold ph-check-circle text-lg"></i> ทำเสร็จแล้ว';
             }
             toggleBtn.onclick = async () => {
                 closeDetailModal();
@@ -1591,6 +1755,7 @@
         }
 
         function closeDetailModal() {
+            closeAllTaskMenus();
             const modal = document.getElementById('detail-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
